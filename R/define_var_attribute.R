@@ -13,6 +13,7 @@ define_var_attribute <- function(data
                        ,value) %>%
     as_data_frame() %>%
     mutate_(.
-            ,.dots = dots)
+            ,.dots = dots) %>%
+    rename_(., .dots = setNames(value, "attr_values"))
   return(attribute)
 }
