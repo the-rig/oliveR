@@ -1,9 +1,9 @@
 
 build_all_metrics <- function(
     dbname = 'oliver_replica',
-    host = '127.0.0.1',
+    host = '10.200.10.1',
     user = 'mienkoja',
-    password = 'D4t4D00d!',
+    password = NA,
     measurement_window = 180,
     measurement_window_start = 20170301
 )
