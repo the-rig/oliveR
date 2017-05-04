@@ -1,0 +1,27 @@
+{
+  "measurement_group": "pcv_performance_monitoring",
+  "measurement_usage": "oliver_sms",
+  "measurements": 
+  [
+    {
+      "id": "acceptance_to_schedule_value",
+      "type": "performance_value"
+    },
+    {
+      "id": "acceptance_to_schedule_target",
+      "type": "performance_target"
+    },
+    {
+      "id": "acceptance_to_first_visit_value",
+      "type": "performance_value"
+    },
+    {
+      "id": "acceptance_to_first_visit_target",
+      "type": "performance_target"
+    },
+    {
+      "id": "child_count_value",
+      "type": "performance_context"
+    }
+    ]
+}

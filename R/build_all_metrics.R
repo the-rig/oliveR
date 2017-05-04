@@ -15,8 +15,7 @@ build_all_metrics <- function(
     password = password
   )
   
-  #build_all_metrics(password = 'D4t4D00d!', host = '10.200.10.1')
-  
+
   dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
   
   # for future use 
@@ -43,7 +42,7 @@ build_all_metrics <- function(
   
   
   # get the first date that a referral was requested, among max request dates
-  message('tbl_first_referral_accepted_ver_min complete...', appendLF = FALSE)
+  message('tbl_first_referral_accepted_ver_min...', appendLF = FALSE)
   tbl_first_referral_accepted_ver_min <- tbl(con, 'ServiceReferrals') %>%
     select(id
            ,versionId
@@ -291,15 +290,15 @@ build_all_metrics <- function(
   message(' complete')
   
   message('saving measurement objects to files...', appendLF = FALSE)
-  saveRDS(acceptance_to_schedule_value, "Data/acceptance_to_schedule_value")
-  saveRDS(acceptance_to_schedule_target, "Data/acceptance_to_schedule_target")
-  saveRDS(acceptance_to_first_visit_value, "Data/acceptance_to_first_visit_value")
-  saveRDS(acceptance_to_first_visit_target, "Data/acceptance_to_first_visit_target")
-  saveRDS(child_count_value, "Data/child_count_value")
+  object_names <- list_measurement_objects()
+  for(i in object_names){
+    filepath <- paste0(system.file('Data', package = 'oliveR')
+                       ,'/'
+                       ,i)
+    saveRDS(object = as_name(i), filepath)
+  }
+
   message(' complete')
-  
-  # this can be used to set a full filepath regardless of the system, once the file is installed. 
-  #  system.file("Data", "child_count_value.rds", package = "oliveR")
 
 }
   
