@@ -248,6 +248,8 @@ build_all_metrics <- function(
   #  Varset Definition & Aggregation    #
   #######################################
   
+  pcv_performance_monitoring <- metric_group$new()
+  
   message('building and aggregating varsets...', appendLF = FALSE)
   
   acceptance_to_schedule_value <- inner_join(referral_period_acceptance_to_schedule[[2]]
@@ -256,14 +258,17 @@ build_all_metrics <- function(
     group_by(attr_values) %>%
     summarise_each(c("mean")) %>%
     metric_performance_provider$new(., 'period_days', 'id_organization')
-
-
+  
+  pcv_performance_monitoring$metric_add(acceptance_to_schedule_value)
+  
   acceptance_to_schedule_target <- inner_join(referral_period_acceptance_to_schedule[[1]]
                                               ,referral_attr_id_organization
                                               ,by = 'id_referral_visit') %>%
     group_by(attr_values) %>%
     summarise_each(c("mean")) %>%
     metric_performance_provider$new(., 'met_target', 'id_organization')
+  
+  pcv_performance_monitoring$metric_add(acceptance_to_schedule_target)
 
   acceptance_to_first_visit_value <- inner_join(referral_period_acceptance_to_first_scheduled[[2]]
                                                 ,referral_attr_id_organization
@@ -272,12 +277,16 @@ build_all_metrics <- function(
     summarise_each(c("mean")) %>%
     metric_performance_provider$new(., 'period_days', 'id_organization')
   
+  pcv_performance_monitoring$metric_add(acceptance_to_first_visit_value)
+  
   acceptance_to_first_visit_target <- inner_join(referral_period_acceptance_to_first_scheduled[[2]]
                                                     ,referral_attr_id_organization
                                                     ,by = 'id_referral_visit') %>%
     group_by(attr_values) %>%
     summarise_each(c("mean")) %>%
     metric_performance_provider$new(., 'met_target', 'id_organization')
+  
+  pcv_performance_monitoring$metric_add(acceptance_to_first_visit_target)
   
   child_count_value <- inner_join(referral_attr_child_count
                                   ,referral_attr_id_organization
@@ -286,19 +295,31 @@ build_all_metrics <- function(
            ,attr_values = attr_values.y) %>%
     group_by(attr_values) %>%
     summarise_each(c("mean")) %>%
-    metric_performance_provider$new(., 'attr_values', 'id_organization')    
+    metric_performance_provider$new(., 'attr_values', 'id_organization')   
+  
+  pcv_performance_monitoring$metric_add(child_count_value) 
+  
   message(' complete')
   
-  message('saving measurement objects to files...', appendLF = FALSE)
-  object_names <- list_measurement_objects()
-  for(i in object_names){
-    filepath <- paste0(system.file('extdata', package = 'oliveR')
-                       ,'/'
-                       ,i)
-    saveRDS(object = as_name(i), filepath)
-  }
-
-  message(' complete')
+  saveRDS(object = pcv_performance_monitoring
+          ,file = paste0(system.file('extdata'
+                                     ,package = 'oliveR')
+                         ,'/'
+                         ,lazyeval::expr_text(pcv_performance_monitoring))
+          )
+  
+  # message('saving measurement objects to files...', appendLF = FALSE)
+  # 
+  # object_names <- list_measurement_objects()
+  # 
+  # for(i in object_names){
+  #   filepath <- paste0(system.file('extdata', package = 'oliveR')
+  #                      ,'/'
+  #                      ,i)
+  #   saveRDS(object = as_name(i), filepath)
+  # }
+  # 
+  # message(' complete')
 
 }
   
