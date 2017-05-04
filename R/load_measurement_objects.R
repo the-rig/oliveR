@@ -4,7 +4,7 @@ load_measurement_objects <- function(){
   
   file_dir <- system.file("Data", package = "oliveR")
   
-  if(dir.exists(file_dir))
+  if(all(dir.exists(file_dir), !is.na(object_names)))
     for(i in object_names){
       filepath <- paste0(file_dir
                          ,'/'
