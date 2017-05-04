@@ -1,6 +1,6 @@
 list_measurement_objects <- function(){
   
-  data_directory <- system.file("Data", package = "oliveR")
+  data_directory <- system.file("extdata", package = "oliveR")
   
   if(dir.exists(data_directory)){
     object_names <- read_json(paste0(data_directory

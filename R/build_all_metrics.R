@@ -292,7 +292,7 @@ build_all_metrics <- function(
   message('saving measurement objects to files...', appendLF = FALSE)
   object_names <- list_measurement_objects()
   for(i in object_names){
-    filepath <- paste0(system.file('Data', package = 'oliveR')
+    filepath <- paste0(system.file('extdata', package = 'oliveR')
                        ,'/'
                        ,i)
     saveRDS(object = as_name(i), filepath)

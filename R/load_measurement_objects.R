@@ -2,7 +2,7 @@ load_measurement_objects <- function(){
   
   object_names <- list_measurement_objects()
   
-  file_dir <- system.file("Data", package = "oliveR")
+  file_dir <- system.file("extdata", package = "oliveR")
   
   if(all(dir.exists(file_dir), !is.na(object_names)))
     for(i in object_names){
