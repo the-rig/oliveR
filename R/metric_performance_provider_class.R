@@ -24,10 +24,15 @@ metric_performance_provider <- R6Class("metric_performance_provider",
           aggr_varset = NULL
           ,metric_key = NULL
           ,organization_key = NULL
-          ,initialize = function(aggr_varset = NA, metric_key = NA, organization_key = NA) {
+          ,measurement_name = NULL
+          ,initialize = function(aggr_varset = NA
+                                 ,metric_key = NA
+                                 ,organization_key = NA
+                                 ,measurement_name = NA) {
             self$aggr_varset <- aggr_varset
             self$metric_key <- metric_key
             self$organization_key <- organization_key
+            self$measurement_name <- measurement_name
           }
           ,get_value = function(organization_key_value) {
             filter_criteria <- interp(~ which_column == organization_key_value, which_column = as_name(self$organization_key))
