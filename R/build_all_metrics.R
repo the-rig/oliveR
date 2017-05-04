@@ -138,7 +138,7 @@ build_all_metrics <- function(
   #NumberOfChildrenOnSR CTE is equivilant to#
   ###########################################
   
-  message('tbl_person_child_record_count complete...', appendLF = FALSE)
+  message('tbl_person_child_record_count...', appendLF = FALSE)
   
   tbl_person_child_record_count <- dbGetQuery(con$con
                                               ,'
@@ -166,7 +166,7 @@ build_all_metrics <- function(
   #Organizations #
   ################
   
-  message('tbl_referral_organization complete...', appendLF = FALSE)
+  message('tbl_referral_organization...', appendLF = FALSE)
   
   tbl_referral_organization <- tbl(con, 'ServiceReferrals') %>%
     select(id
@@ -301,12 +301,20 @@ build_all_metrics <- function(
   
   message(' complete')
   
+  message('saving objects to file. does file exist...', appendLF = FALSE)
+  
+  file_path <- paste0(system.file('extdata'
+                                  ,package = 'oliveR')
+                      ,'/'
+                      ,lazyeval::expr_text(pcv_performance_monitoring)
+  )
+  
   saveRDS(object = pcv_performance_monitoring
-          ,file = paste0(system.file('extdata'
-                                     ,package = 'oliveR')
-                         ,'/'
-                         ,lazyeval::expr_text(pcv_performance_monitoring))
-          )
+          ,file = file_path)
+  
+  message(paste0(' '
+                 ,file.exists(file_path))
+  )
   
   # message('saving measurement objects to files...', appendLF = FALSE)
   # 
