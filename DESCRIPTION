@@ -22,6 +22,8 @@ Depends:
     ,httr
     ,keyringr
     ,lazyeval
+    ,ggvis
+    ,RJSONIO
 Suggests:
     svglite
     ,XML
