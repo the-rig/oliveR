@@ -3,6 +3,7 @@ build_all_metrics <- function(
     host = Sys.getenv("OLIVER_REPLICA_HOST"),    
     user = Sys.getenv("OLIVER_REPLICA_USER"),
     password = Sys.getenv("OLIVER_REPLICA_PASSWORD"),
+    port = Sys.getenv("OLIVER_REPLICA_PORT"),    
     measurement_window = 180,
     measurement_window_start = 20170301
 )
@@ -11,7 +12,8 @@ build_all_metrics <- function(
     dbname = dbname,
     host = host,
     user = user,
-    password = password
+    password = password,
+    port = port
   )
   
 
