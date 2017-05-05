@@ -1,4 +1,4 @@
-libraget_metric_json <- function(mpp_group = pcv_performance_monitoring, group_id){
+get_metric_json <- function(mpp_group = pcv_performance_monitoring, group_id){
   
   metric_list <- mpp_group$metric_list
   

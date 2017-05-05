@@ -1,9 +1,8 @@
-
 build_all_metrics <- function(
-    dbname = 'oliver_replica',
-    host = '10.200.10.1',    
-    user = 'mienkoja',
-    password = NA,
+    dbname = Sys.getenv("OLIVER_REPLICA_DBNAME"),
+    host = Sys.getenv("OLIVER_REPLICA_HOST"),    
+    user = Sys.getenv("OLIVER_REPLICA_USER"),
+    password = Sys.getenv("OLIVER_REPLICA_PASSWORD"),
     measurement_window = 180,
     measurement_window_start = 20170301
 )
