@@ -277,7 +277,7 @@ build_all_metrics <- function(
     metric_performance_provider$new(., 'period_days', 'attr_values', 'acceptance_to_first_visit_value') %>%
     pcv_performance_monitoring$metric_add(.)
   
-  inner_join(referral_period_acceptance_to_first_scheduled[[2]]
+  inner_join(referral_period_acceptance_to_first_scheduled[[1]]
                                                     ,referral_attr_id_organization
                                                     ,by = 'id_referral_visit') %>%
     group_by(attr_values) %>%
