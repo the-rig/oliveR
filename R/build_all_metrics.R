@@ -1,7 +1,7 @@
 
 build_all_metrics <- function(
     dbname = 'oliver_replica',
-    host = '127.0.0.1',
+    host = '10.200.10.1',    
     user = 'mienkoja',
     password = NA,
     measurement_window = 180,
@@ -269,7 +269,6 @@ build_all_metrics <- function(
     metric_performance_provider$new(., 'met_target', 'attr_values', 'acceptance_to_schedule_target') %>%
     pcv_performance_monitoring$metric_add(.)
   
-
   inner_join(referral_period_acceptance_to_first_scheduled[[2]]
                                                 ,referral_attr_id_organization
                                                 ,by = 'id_referral_visit') %>%
