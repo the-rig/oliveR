@@ -1,4 +1,4 @@
-get_metric_json <- function(mpp_group = pcv_performance_monitoring, group_id){
+get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
   
   metric_list <- mpp_group$metric_list
   
@@ -19,7 +19,7 @@ get_metric_json <- function(mpp_group = pcv_performance_monitoring, group_id){
     
   }
   
-  metric_json <- toJSON(list(group, measurements), pretty = TRUE)
+  metric_json <- list(group, measurements)
   
   return(metric_json)
 
