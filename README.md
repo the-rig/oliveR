@@ -19,7 +19,7 @@ oliveR can be installed from from github with:
 devtools::install_github("hadley/pkgdown")
 ```
 
-## Usage Anywhere
+## Usage
 
 The interaction between [oliver-opencpu-server-docker](https://github.com/pocdata/oliver-opencpu-server-docker) and oliveR relies on the present of one or more "metric" objects. On the initial install of oliveR, no metric objects are present as the data contained within may be sensitive. The first time you load oliveR (and each time you want to refresh the metric objects), you should update the metric objects with: 
 
