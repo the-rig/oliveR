@@ -30,8 +30,6 @@
 #' create_ssh_command(private_key_path = '/Users/mienkoja/.ssh/id_rsa'
 #'                    ,reverse_tunnel_target_user = 'mienkoja')
 #'                    
-create_ssh_command(private_key_path = '/Users/mienkoja/.ssh/id_rsa'
-                    ,reverse_tunnel_target_user = 'mienkoja')
 
 create_ssh_command <- function(private_key_path = NA
                                ,target_port = 5431
