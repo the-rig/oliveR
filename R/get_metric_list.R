@@ -12,15 +12,15 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
     
     measurement_names[[i]] <- metric_list[[i]]$measurement_name
     
-    measurements[[i]] <- list(value = metric_list[[i]]$get_value(22)
-                              ,graph = NA) # will add graph in a later push 
+    measurements[[i]] <- list(value = metric_list[[i]]$get_value(group_id)
+                              ,graph = metric_list[[i]]$get_donut(group_id)) # will add graph in a later push 
     
     names(measurements) <- measurement_names
     
   }
   
-  metric_json <- list(group, measurements)
+  metric_list_parsed <- list(group, measurements)
   
-  return(metric_json)
+  return(metric_list_parsed)
 
 }
