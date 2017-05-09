@@ -29,10 +29,13 @@
 #' @examples
 #' create_ssh_command(private_key_path = '/Users/mienkoja/.ssh/id_rsa'
 #'                    ,reverse_tunnel_target_user = 'mienkoja')
+#'                    
+create_ssh_command(private_key_path = '/Users/mienkoja/.ssh/id_rsa'
+                    ,reverse_tunnel_target_user = 'mienkoja')
 
 create_ssh_command <- function(private_key_path = NA
                                ,target_port = 5431
-                               ,local_port_for_forward = 5432
+                               ,local_port_for_forward = '10.200.10.1:5432'
                                ,forward_target_host = 'oliver-replica.criploulbgnu.us-west-2.rds.amazonaws.com'
                                ,forward_target_port = 5432
                                ,reverse_tunnel_target_user = NA
