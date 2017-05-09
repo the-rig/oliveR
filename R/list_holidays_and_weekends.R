@@ -21,53 +21,30 @@ list_holidays_and_weekends <- function(from_date = '01-01-2011'
                                        ,to_date = '01-01-2111'
                                        ,country_filter = 'usa'
                                        ,region_filter = 'Washington'){
-  #holidays 
-  content_url <- paste0(
-    'http://www.kayaposoft.com/enrico/json/v1.0/?action=getPublicHolidaysForDateRange&='
-    ,'&fromDate='
-    ,from_date
-    ,'&toDate='
-    ,to_date
-    ,'&country='
-    ,country_filter
-    ,'&region='
-    ,region_filter
-  )
-  
+  content_url <- paste0("http://www.kayaposoft.com/enrico/json/v1.0/?action=getPublicHolidaysForDateRange&=", 
+                        "&fromDate=", from_date, "&toDate=", to_date, "&country=", 
+                        country_filter, "&region=", region_filter)
   GET_content <- GET(content_url)
-  
-  holidays <- content(GET_content, as = 'text') %>%
-    as.tbl_json() %>% 
-    gather_array() %>%
-    enter_object("date") %>%
-    spread_values(day = jstring("day")
-                  ,month = jstring("month")
-                  ,year = jstring('year')) %>%
-    mutate(holidate = paste0(year, str_pad(month, 2, pad = '0'), str_pad(day, 2, pad = '0'))
-           ,holidate = ymd(holidate)) %>%
+  holidays <- content(GET_content, as = "text", encoding = 'UTF-8') %>% as.tbl_json() %>% 
+    gather_array() %>% enter_object("date") %>% spread_values(day = jstring("day"), 
+                                                              month = jstring("month"), year = jstring("year")) %>% 
+    mutate(holidate = paste0(year, str_pad(month, 2, pad = "0"), 
+                             str_pad(day, 2, pad = "0")), holidate = ymd(holidate)) %>% 
     .$holidate
+  day_seq <- seq(from = dmy(from_date), to = dmy(to_date), 
+                 by = "days")
+  weekend_days <- day_seq[wday(day_seq, label = TRUE) %in% 
+                            c("Sat", "Sun")]
+  holiday_intervals <- interval(ymd_hms(paste0(holidays, " 00:00:00"), 
+                                        tz = "America/Los_Angeles"), ymd_hms(paste0(holidays, 
+                                                                                    " 00:00:00"), tz = "America/Los_Angeles") + hours(24))
+  weekend_intervals <- interval(
+    ymd_hms(paste0(weekend_days, " 00:00:00"), tz = "America/Los_Angeles")
+    ,ymd_hms(paste0(weekend_days, " 00:00:00"), tz = "America/Los_Angeles") + hours(24))
   
-  # weekends
-  day_seq <- seq(from = dmy(from_date)
-                 ,to = dmy(to_date)
-                 ,by = 'days')
+  interval_df <- rbind(data.frame(interval = holiday_intervals), data.frame(interval = weekend_intervals))
   
-  weekend_days <- day_seq[wday(day_seq, label = TRUE) %in% c("Sat", "Sun")]
-  
-  
-  holiday_intervals <- interval(ymd_hms(paste0(holidays, ' 00:00:00')
-                                        ,tz = 'America/Los_Angeles')
-                                ,ymd_hms(paste0(holidays, ' 00:00:00')
-                                         ,tz = 'America/Los_Angeles') + hours(24)
-  )
-  
-  weekend_intervals <- interval(ymd_hms(paste0(weekend_days, ' 00:00:00')
-                                        ,tz = 'America/Los_Angeles')
-                                ,ymd_hms(paste0(weekend_days, ' 00:00:00')
-                                         ,tz = 'America/Los_Angeles') + hours(24)
-  )
-  
-  day_exclusions <- c(holiday_intervals, weekend_intervals)
+  day_exclusions <- interval_df$interval
   
   return(day_exclusions)
 }
