@@ -24,6 +24,10 @@ Depends:
     ,lazyeval
     ,ggvis
     ,RJSONIO
+    ,graphics
+    ,grid
+    ,grDevices
+    ,gridSVG
 Suggests:
     svglite
     ,XML
