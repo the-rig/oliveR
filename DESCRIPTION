@@ -3,7 +3,7 @@ Type: Package
 Title: A package for extracting data from the oliver sms replica and creating measurements
 Version: 0.1.0
 Author: Joe Mienko <mienkoja@uw.edu>
-Maintainer: Erik Oien <oieeri26@uw.edu>
+Maintainer: Erik Oien <oieeri26@uw.edu>, Jooree Ahn <jooreea@uw.edu>
 Description: This package is designed to provide authorized used with a streamline method through which designated users can extract data from the oliver replica running on AWS and perform various measurements for use in the oliver application as well as other reports based on oliver data. 
 License: MIT
 Encoding: UTF-8
