@@ -15,7 +15,6 @@ build_all_metrics <- function(
     password = password,
     port = port
   )
-  
 
   dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
   
@@ -65,7 +64,7 @@ build_all_metrics <- function(
            ,referralReason
            ,updatedAt
            ,versionId) %>%
-    inner_join(tbl_first_referral_accepted_ver_min) %>%
+    inner_join(tbl_first_referral_accepted_ver_min, by = c("id", "versionId")) %>%
     as_data_frame() %>%
     filter(updatedAt > (updatedAt - lubridate::days(measurement_window))
            ,updatedAt > lubridate::ymd(measurement_window_start)
@@ -97,7 +96,7 @@ build_all_metrics <- function(
   
   message('tbl_referral_scheduling_events...', appendLF = FALSE)
   tbl_referral_scheduling_events <- tbl(con, 'ServiceReferrals') %>%
-    inner_join(tbl_first_referral_scheduling_ver_min) %>%
+    inner_join(tbl_first_referral_scheduling_ver_min, by = c("versionId", "id")) %>%
     select(id
            ,referralReason
            ,updatedAt) %>%
@@ -299,7 +298,7 @@ build_all_metrics <- function(
   
   message(' complete')
   
-  message('saving objects to file. does file exist...', appendLF = FALSE)
+  message('saving objects to file. file exists?...', appendLF = FALSE)
   
   file_path <- paste0(system.file('extdata'
                                   ,package = 'oliveR')
@@ -313,6 +312,7 @@ build_all_metrics <- function(
   message(paste0(' '
                  ,file.exists(file_path))
   )
+  
   
   # message('saving measurement objects to files...', appendLF = FALSE)
   # 
