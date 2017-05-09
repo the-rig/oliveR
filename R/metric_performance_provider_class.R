@@ -45,7 +45,7 @@ metric_performance_provider <- R6Class("metric_performance_provider",
             if(all(!is.na(self$get_value(organization_key_value))
                    ,self$get_value(organization_key_value) <= 1
                    ,self$get_value(organization_key_value) >= 0))
-              donut_out <- ggvis_donut(proportion = self$get_value(organization_key_value))
+              donut_out <- percent_donut_svg(proportion = self$get_value(organization_key_value))
             else
               donut_out <- NA
             return(donut_out)
