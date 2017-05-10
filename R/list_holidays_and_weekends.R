@@ -14,7 +14,7 @@
 #' @examples
 #'
 #' list_holidays_and_weekends()
-
+#' 
 
 
 list_holidays_and_weekends <- function(from_date = '01-01-2011'

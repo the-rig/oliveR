@@ -25,6 +25,7 @@ This function is used to generate a vector of holiday and weekend \code{Interval
 \examples{
 
 list_holidays_and_weekends()
+
 }
 \author{
 Joe Mienko, \email{mienkoja@uw.edu}
