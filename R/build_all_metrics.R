@@ -5,7 +5,8 @@ build_all_metrics <- function(
     password = Sys.getenv("OLIVER_REPLICA_PASSWORD"),
     port = Sys.getenv("OLIVER_REPLICA_PORT"),    
     measurement_window = 180,
-    measurement_window_start = 20170301
+    measurement_window_start = 20170301,
+    na.rm = TRUE
 )
 {
   con <- src_postgres(
@@ -257,7 +258,7 @@ build_all_metrics <- function(
                                              ,by = 'id_referral_visit') %>%
     select(-id_referral_visit) %>%
     group_by(attr_values) %>%
-    summarise_each(c("mean")) %>%
+    summarise_each(c("mean"), na.rm = na.rm) %>%
     metric_performance_provider$new(., 'period_days', 'attr_values', 'acceptance_to_schedule_value') %>%
     pcv_performance_monitoring$metric_add(.)
   
@@ -265,7 +266,7 @@ build_all_metrics <- function(
                                               ,referral_attr_id_organization
                                               ,by = 'id_referral_visit') %>%
     group_by(attr_values) %>%
-    summarise_each(c("mean")) %>%
+    summarise_each(c("mean"), na.rm = na.rm) %>%
     metric_performance_provider$new(., 'met_target', 'attr_values', 'acceptance_to_schedule_target') %>%
     pcv_performance_monitoring$metric_add(.)
   
@@ -273,7 +274,7 @@ build_all_metrics <- function(
                                                 ,referral_attr_id_organization
                                                 ,by = 'id_referral_visit') %>%
     group_by(attr_values) %>%
-    summarise_each(c("mean")) %>%
+    summarise_each(c("mean"), na.rm = na.rm) %>%
     metric_performance_provider$new(., 'period_days', 'attr_values', 'acceptance_to_first_visit_value') %>%
     pcv_performance_monitoring$metric_add(.)
   
@@ -281,7 +282,7 @@ build_all_metrics <- function(
                                                     ,referral_attr_id_organization
                                                     ,by = 'id_referral_visit') %>%
     group_by(attr_values) %>%
-    summarise_each(c("mean")) %>%
+    summarise_each(c("mean"), na.rm = na.rm) %>%
     metric_performance_provider$new(., 'met_target', 'attr_values', 'acceptance_to_first_visit_target') %>%
     pcv_performance_monitoring$metric_add(.)
   
@@ -292,7 +293,7 @@ build_all_metrics <- function(
            ,id_organization = attr_values.y) %>%
     select(-id_referral_visit) %>%
     group_by(id_organization) %>%
-    summarise_each(c("mean")) %>%
+    summarise_each(c("mean"), na.rm = na.rm) %>%
     metric_performance_provider$new(., 'attr_child_count', 'id_organization', 'child_count_value') %>%
     pcv_performance_monitoring$metric_add(.)
   
