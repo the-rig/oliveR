@@ -9,6 +9,15 @@ Database access and measurement development for the Oliver SMS. The package is d
 3. Authy account information should be forwarded to \email{mattbro@uw.edu} prior to trying to establish a connection to the replica with the command string or access will be denied. Access to `oliver_replica` requires two-factor authentication. Authy (\url{https://www.authy.com/}) is used for this purpose. 
 4. A connection to the `oliver_replica` database. This is accomplished with a complex `ssh` statement, a sample of which is as follows: `ssh -i /Users/mienkoja/.ssh/id_rsa -p 5431 -L 10.200.10.1:5432:oliver-replica.criploulbgnu.us-west-2.rds.amazonaws.com:5432 -N mienkoja@52.90.57.218`. This statement can be generated for a specific user from within oliveR using the `create_ssh_command()` function. 
 5. A functioning instance of [oliver-opencpu-server-docker](https://github.com/pocdata/oliver-opencpu-server-docker). 
+6. Unless you want to specify your credentials manually, the `build_all_metrics()` function is set to pull connection parameters for `oliver_replica` from the environment. These can be set according within your favorite shell environment *or* can be set within R using `Sys.setenv()` as shown below: 
+
+```
+Sys.setenv(OLIVER_REPLICA_DBNAME = "oliver_replica"
+           ,OLIVER_REPLICA_HOST = "10.200.10.1"
+           ,OLIVER_REPLICA_USER = "mienkoja"
+           ,OLIVER_REPLICA_PORT = "5432"
+           ,OLIVER_REPLICA_PASSWORD = "my_password")
+```
 
 ## Installation
 
