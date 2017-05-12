@@ -1,43 +1,39 @@
 get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
   
-  metric_list <- mpp_group$metric_list
   
-  measurement_names <- vector(mode = 'list', length = 0)
-  measurements <- vector(mode = 'list', length = 0)
-  providers <- vector(mode = 'list', length = 0)
+  metric_dim_list <- list(create_measurement_dimension_set(group_id = group_id
+                                   ,mpp_group = mpp_group
+                                   ,characteristic = 'Days Until Visit is Scheduled'
+                                   ,characteristic_label = 'Scheduled Within 3 Days'
+                                   ,characteristic_summary_obj = 1
+                                   ,characteristic_percent_conforming_obj = 2
+                                   ,characteristic_data_quality_obj = 3)
+  
+  ,create_measurement_dimension_set(group_id = group_id
+                                   ,mpp_group = mpp_group
+                                   ,characteristic = 'Days Until First Visit, as Scheduled'
+                                   ,characteristic_label = 'First Visit (as Scheduled) Within 7 Days'
+                                   ,characteristic_summary_obj = 4
+                                   ,characteristic_percent_conforming_obj = 5
+                                   ,characteristic_data_quality_obj = 6)
+  
+  ,create_measurement_dimension_set(group_id = group_id
+                                   ,mpp_group = mpp_group
+                                   ,characteristic = 'Children per Referral'
+                                   ,characteristic_label = 'Children per Referral'
+                                   ,characteristic_summary_obj = 7)
+  
+  ,create_measurement_dimension_set(group_id = group_id
+                                   ,mpp_group = mpp_group
+                                   ,characteristic = 'Percentage of Scheduled Visits, which Were Attended'
+                                   ,characteristic_label = 'Visit Attendance Rate'
+                                   ,characteristic_summary_obj = 8))
+
   
   group <- list(group_id = group_id)
   
-  for (i in 1:length(metric_list)){
-    
-    measurement_names[[i]] <- metric_list[[i]]$measurement_name
-    
-    # apply formatting to value 
-    
-    value <- metric_list[[i]]$get_value(group_id)
-    
-    if (metric_list[[i]]$measurement_format == 'percent')
-      value <- sprintf(paste0('%1.'
-                              ,pcv_performance_monitoring$metric_list[[2]]$measurement_rounding
-                              ,'f%%')
-                       ,100*value)
-    else 
-      value <- sprintf(paste0('%.'
-                              ,pcv_performance_monitoring$metric_list[[2]]$measurement_rounding
-                              ,'f')
-                       ,value)
-    
-    
-    # build list 
-    measurements[[i]] <- list(value = value
-                              ,graph = metric_list[[i]]$get_donut(group_id)) # will add graph in a later push 
-    
-    names(measurements) <- measurement_names
-    
-  }
+  metric_list <- list(group, metric_dim_list)
   
-  metric_list_parsed <- list(group, measurements)
-  
-  return(metric_list_parsed)
+  return(metric_list)
 
 }

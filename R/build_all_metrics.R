@@ -320,7 +320,7 @@ build_all_metrics <- function(
     metric_performance_provider$new(.
                                     ,metric_key = 'period_days'
                                     ,organization_key = 'attr_values'
-                                    ,measurement_name = 'acceptance_to_schedule_value'
+                                    ,measurement_name = 'acceptance_to_schedule'
                                     ,measurement_format = 'numeric'
                                     ,measurement_rounding = 1
                                     ) %>%
@@ -335,7 +335,7 @@ build_all_metrics <- function(
     metric_performance_provider$new(.
                                     ,metric_key = 'met_target'
                                     ,organization_key = 'attr_values'
-                                    ,measurement_name = 'acceptance_to_schedule_target'
+                                    ,measurement_name = 'acceptance_to_schedule'
                                     ,measurement_format = 'percent'
                                     ,measurement_rounding = 0                     
                                     ) %>%
@@ -350,7 +350,7 @@ build_all_metrics <- function(
     metric_performance_provider$new(.
                                     ,metric_key = 'valid_data'
                                     ,organization_key = 'attr_values'
-                                    ,measurement_name = 'acceptance_to_schedule_quality'
+                                    ,measurement_name = 'acceptance_to_schedule'
                                     ,measurement_format = 'percent'
                                     ,measurement_rounding = 0                     
     ) %>%
@@ -365,7 +365,7 @@ build_all_metrics <- function(
     metric_performance_provider$new(.
                                     ,metric_key = 'period_days'
                                     ,organization_key = 'attr_values'
-                                    ,measurement_name = 'acceptance_to_first_visit_value'
+                                    ,measurement_name = 'acceptance_to_first_visit'
                                     ,measurement_format = 'numeric'
                                     ,measurement_rounding = 1                                    
                                     ) %>%
@@ -380,7 +380,7 @@ build_all_metrics <- function(
     metric_performance_provider$new(.
                                     ,metric_key = 'met_target'
                                     ,organization_key = 'attr_values'
-                                    ,measurement_name = 'acceptance_to_first_visit_target'
+                                    ,measurement_name = 'acceptance_to_first_visit'
                                     ,measurement_format = 'percent'
                                     ,measurement_rounding = 0                                    
                                     ) %>%
@@ -395,7 +395,7 @@ build_all_metrics <- function(
     metric_performance_provider$new(.
                                     ,metric_key = 'valid_data'
                                     ,organization_key = 'attr_values'
-                                    ,measurement_name = 'acceptance_to_first_visit_quality'
+                                    ,measurement_name = 'acceptance_to_first_visit'
                                     ,measurement_format = 'percent'
                                     ,measurement_rounding = 0                     
     ) %>%
