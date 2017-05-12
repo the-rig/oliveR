@@ -21,6 +21,49 @@ build_all_metrics <- function(
   # for future use 
   #con <- oliver_replica_connect()
   
+  
+  ###########################################
+  # visit reports                           #
+  ###########################################
+  
+  message('tbl_visit_reports...', appendLF = FALSE)
+  
+  tbl_service_referrals <- tbl(con, 'ServiceReferrals') %>%
+    select(id
+           ,organizationId
+           ,isCurrentVersion
+           ,deletedAt) %>%
+    rename(serviceReferralId = id) %>%
+    filter(isCurrentVersion
+           ,is.na(deletedAt)) %>%
+    select(-isCurrentVersion, -deletedAt) %>%
+    as_data_frame()
+  
+  tbl_visit_reports_raw <- tbl(con, 'VisitReports') %>%
+    select(id
+           ,serviceReferralId
+           ,cancellationType
+           ,isCurrentVersion
+           ,deletedAt
+           ,approvedAt
+           ,dateNormalized) %>%
+    as_data_frame() %>%
+    filter(isCurrentVersion
+           ,is.na(deletedAt)
+           ,!is.na(approvedAt)
+           ,dateNormalized > (lubridate::now(tzone = 'America/Los_Angeles') - lubridate::days(measurement_window))
+           ,dateNormalized > lubridate::ymd(measurement_window_start)
+    )
+  
+  tbl_visit_reports <- inner_join(tbl_service_referrals
+                                 ,tbl_visit_reports_raw
+                                 ,by = 'serviceReferralId') %>%
+    mutate(visitation_attended = ifelse(is.na(cancellationType), TRUE, FALSE)
+           ,id_referral_visit = serviceReferralId)
+  
+  message(' complete')
+  
+
   ###########################################
   #ReferralAcceptedDate CTE is equivilant to#
   ###########################################
@@ -68,7 +111,7 @@ build_all_metrics <- function(
            ,versionId) %>%
     inner_join(tbl_first_referral_accepted_ver_min, by = c("id", "versionId")) %>%
     as_data_frame() %>%
-    filter(updatedAt > (updatedAt - lubridate::days(measurement_window))
+    filter(updatedAt > (lubridate::now(tzone = 'America/Los_Angeles') - lubridate::days(measurement_window))
            ,updatedAt > lubridate::ymd(measurement_window_start)
            ,referralReason == 'Initial') %>%
     select(-versionId) %>%
@@ -202,6 +245,10 @@ build_all_metrics <- function(
   referral_attr_child_count <- define_var_attribute(tbl_person_child_record_count
                                                     ,'id_referral_visit'
                                                     ,'child_count_attr')
+  
+  referral_visit_attendance <- define_var_attribute(tbl_visit_reports
+                                                    ,'id_referral_visit'
+                                                    ,'visitation_attended')
   
   ## Define Events
   
@@ -371,6 +418,23 @@ build_all_metrics <- function(
                                     ) %>%
     pcv_performance_monitoring$metric_add(.)
   
+  inner_join(referral_visit_attendance
+             ,referral_attr_id_organization
+             ,by = 'id_referral_visit') %>%
+    rename(attr_visit_attendance = attr_values.x
+           ,id_organization = attr_values.y) %>%    
+    select(-id_referral_visit) %>%    
+    group_by(id_organization) %>%
+    summarise_all(c("mean"), na.rm = TRUE) %>%
+    metric_performance_provider$new(.
+                                    ,metric_key = 'attr_visit_attendance'
+                                    ,organization_key = 'id_organization'
+                                    ,measurement_name = 'attendance_per_scheduled_visit'
+                                    ,measurement_format = 'percent'
+                                    ,measurement_rounding = 0                     
+    ) %>%
+    pcv_performance_monitoring$metric_add(.)
+  
   message(' complete')
   
   message('saving objects to file. file exists?...', appendLF = FALSE)
@@ -387,20 +451,6 @@ build_all_metrics <- function(
   message(paste0(' '
                  ,file.exists(file_path))
   )
-  
-  
-  # message('saving measurement objects to files...', appendLF = FALSE)
-  # 
-  # object_names <- list_measurement_objects()
-  # 
-  # for(i in object_names){
-  #   filepath <- paste0(system.file('extdata', package = 'oliveR')
-  #                      ,'/'
-  #                      ,i)
-  #   saveRDS(object = as_name(i), filepath)
-  # }
-  # 
-  # message(' complete')
 
 }
   
