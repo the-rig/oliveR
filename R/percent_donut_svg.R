@@ -1,18 +1,18 @@
-percent_donut_svg = function(proportion = .5
+percent_donut_svg = function(proportion = .4
                                 ,fill = c("#FC4A1A", "#dfdce3")
                                 ,thickness_out = 4
                                 ,thickness_in = 3
                                 ,inner_radius = 50
                                 ,outer_radius = 100){
   
-  dat <- data.frame(inner = inner_radius
-                    ,outer = outer_radius
-                    ,fill = fill
-                    ,proportions = c(proportion, 1-proportion)
-  ) %>% 
-    mutate(ymax = c(proportions[1], 1)
-           ,ymin =  c(0, proportions[2])
-  )
+  # Create test data.
+  dat <- data.frame(prop=c(proportion, 1-proportion))
+  
+  # Add addition columns, needed for drawing with geom_rect.
+  dat$fraction <- dat$prop / sum(dat$prop)
+  dat <- dat[order(dat$fraction), ]
+  dat$ymax <- cumsum(dat$fraction)
+  dat$ymin <- c(0, head(dat$ymax, n=-1))
   
   plot <- dat %>%     
     ggplot(aes(fill=fill
