@@ -2,7 +2,7 @@
 
 Database access and measurement development for the Oliver SMS. The package is designed to work with the [oliver-opencpu-server-docker](https://github.com/pocdata/oliver-opencpu-server-docker) and the `oliver_replica` psql database. 
 
-## Prerequisites 
+## Prerequisites for Mac and Mac-ish environments 
 
 1. A public/private key pair with the public key shared to mattbro@uw.edu and residing on the reverse tunnel target.
 2. A valid username on the reverse tunnel target. Can be set by contacting mattbro@uw.edu.
@@ -18,6 +18,8 @@ Sys.setenv(OLIVER_REPLICA_DBNAME = "oliver_replica"
            ,OLIVER_REPLICA_PORT = "5432"
            ,OLIVER_REPLICA_PASSWORD = "my_password")
 ```
+
+## Prerequisites for Windows 
 
 ## Installation
 
