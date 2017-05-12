@@ -34,26 +34,15 @@ create_measurement_dimension_set <- function(mpp_group = NA
   characteristic_data_quality_value = ifelse(!is.na(characteristic_data_quality_obj)
                                              ,metric_list[[characteristic_data_quality_obj]]$get_value(group_id)
                                              ,NA)
-  dimensions <- list(characteristic
-                     ,characteristic_label
-                     ,characteristic_sub_label
-                     ,characteristic_summary_value
-                     ,characteristic_percent_conforming_value
-                     ,characteristic_percent_conforming_value_pretty
-                     ,characteristic_percent_conforming_graph
-                     ,characteristic_data_quality_value)
   
-  names(dimensions) <- c('characteristic'
-                          ,'characteristic_label'
-                          ,'characteristic_sub_label'
-                          ,'characteristic_summary_value'
-                          ,'characteristic_percent_conforming_value'
-                         ,'characteristic_percent_conforming_value_pretty'
-                          ,'characteristic_percent_conforming_graph'
-                          ,'characteristic_data_quality_value')
+  dimensions <- data.frame(characteristic = characteristic
+             ,characteristic_label = characteristic_label
+             ,characteristic_sub_label = characteristic_sub_label
+             ,characteristic_summary_value = characteristic_summary_value
+             ,characteristic_percent_conforming_value = characteristic_percent_conforming_value
+             ,characteristic_percent_conforming_value_pretty = characteristic_percent_conforming_value_pretty
+             ,characteristic_percent_conforming_graph = characteristic_percent_conforming_graph
+             ,characteristic_data_quality_value = characteristic_data_quality_value)
   
-  dimension_set <- list(metric_key
-                        ,dimensions)
-  
-  return(dimension_set)
+  return(dimensions)
 }
