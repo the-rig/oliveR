@@ -41,7 +41,7 @@ percent_donut_svg = function(proportion = .4
                      ,htmlWrapper = TRUE)
   
   #svg_only <- paste0(capture.output(svg$svg, file = NULL), collapse = '\n')
-  #svg_only <- svg$svg
+  svg_only <- svg$svg
   
   grDevices::dev.off(which = dev.cur())
   
