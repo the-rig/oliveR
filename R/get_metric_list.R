@@ -51,12 +51,10 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
   
   missing_list <- missing_list_add(x$attendance_per_scheduled_visit$measurement_missing)
   
-  y <- data.frame(id = c("no data available"))
-  
   if (sum(unlist(missing_list)) == length(unlist(missing_list))){
-    return(y)
-  } else {
-    return(x)    
-  }
+    x$id <- 'no data available'
+  } 
+  
+  return(x)
   
 }
