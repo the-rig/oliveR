@@ -2,10 +2,10 @@ Package: oliveR
 Type: Package
 Title: A package for extracting data from the oliver sms replica and creating measurements
 Version: 0.1.0
-Authors@R: c(person("Joe", "Mienko", role = c("aut", "cre"),
+Authors@R: c(person("Joe", "Mienko", role = c("aut"),
                      email = "mienkoja@uw.edu"),
-              person("Erik", "Oien", role = "ctb", email = "oieeri26@uw.edu"),
-              person("Jooree", "Ahn", role = "ctb", email = "jooreea@uw.edu"))
+              person("Erik", "Oien", role = c("aut"), email = "oieeri26@uw.edu"),
+              person("Jooree", "Ahn", role = c("aut", "cre"), email = "jooreea@uw.edu"))
 Description: This package is designed to provide authorized used with a streamline method through which designated users can extract data from the oliver replica running on AWS and perform various measurements for use in the oliver application as well as other reports based on oliver data. 
 License: MIT
 Encoding: UTF-8
@@ -30,7 +30,3 @@ Depends:
     ,grid
     ,grDevices
     ,gridSVG
-Suggests:
-    svglite
-    ,XML
-    ,png
