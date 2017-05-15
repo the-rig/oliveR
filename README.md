@@ -21,6 +21,8 @@ Sys.setenv(OLIVER_REPLICA_DBNAME = "oliver_replica"
 
 ## Prerequisites for Windows 
 
+* Placeholder for Windows instructions 
+
 ## Installation
 
 oliveR can be installed from from github with:
