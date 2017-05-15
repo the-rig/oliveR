@@ -8,7 +8,6 @@ Authors@R: c(person("Joe", "Mienko", role = c("aut"),
               person("Jooree", "Ahn", role = c("aut", "cre"), email = "jooreea@uw.edu"))
 Description: This package is designed to provide authorized used with a streamline method through which designated users can extract data from the oliver replica running on AWS and perform various measurements for use in the oliver application as well as other reports based on oliver data. 
 License: MIT
-Encoding: UTF-8
 LazyData: TRUE
 RoxygenNote: 6.0.1
 Depends:
