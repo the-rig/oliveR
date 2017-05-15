@@ -1,6 +1,6 @@
 Package: oliveR
 Type: Package
-Title: A package for extracting data from the oliver sms replica and creating measurements
+Title: A package for extracting data from the oliver SMS replica and creating measurements
 Version: 0.1.0
 Authors@R: c(person("Joe", "Mienko", role = c("aut"),
                      email = "mienkoja@uw.edu"),
