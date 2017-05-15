@@ -17,8 +17,8 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
                                    ,sub_label_pre = 'Avg. '
                                    ,sub_label_post = ' Days Until Scheduled')
 
-  missing_list <- missing_list_add(x$acceptance_to_schedule$measurement_missing)
-  
+  # missing_list <- missing_list_add(x$acceptance_to_schedule$measurement_missing)
+  # 
   x$acceptance_to_first_visit <- create_measurement_dimension_set(group_id = group_id
                                    ,mpp_group = mpp_group
                                    ,characteristic = 'Days Until First Visit, as Planned'
@@ -29,8 +29,8 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
                                    ,sub_label_pre = 'Avg. '
                                    ,sub_label_post = ' Days Until First Visit')
   
-  missing_list <- missing_list_add(x$acceptance_to_first_visit$measurement_missing)
-  
+  # missing_list <- missing_list_add(x$acceptance_to_first_visit$measurement_missing)
+  # 
   x$child_count_value = create_measurement_dimension_set(group_id = group_id
                                    ,mpp_group = mpp_group
                                    ,characteristic = 'Children per Referral'
@@ -39,8 +39,8 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
                                    ,characteristic_percent_conforming_obj = NA
                                    ,characteristic_data_quality_obj = NA)
   
-  missing_list <- missing_list_add(x$child_count_value$measurement_missing)
-  
+  # missing_list <- missing_list_add(x$child_count_value$measurement_missing)
+  # 
   x$attendance_per_scheduled_visit = create_measurement_dimension_set(group_id = group_id
                                    ,mpp_group = mpp_group
                                    ,characteristic = 'Percentage of Scheduled Visits, which Were Attended'
@@ -49,12 +49,12 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
                                    ,characteristic_percent_conforming_obj = NA
                                    ,characteristic_data_quality_obj = NA)
   
-  missing_list <- missing_list_add(x$attendance_per_scheduled_visit$measurement_missing)
-  
-  if (sum(unlist(missing_list)) == length(unlist(missing_list))){
-    x$id <- 'no data available'
-  } 
-  
+  # missing_list <- missing_list_add(x$attendance_per_scheduled_visit$measurement_missing)
+  # 
+  # if (sum(unlist(missing_list)) == length(unlist(missing_list))){
+  #   x$id <- 'no data available'
+  # } 
+  # 
   return(x)
   
 }
