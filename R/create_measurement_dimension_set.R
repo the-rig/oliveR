@@ -4,18 +4,26 @@ create_measurement_dimension_set <- function(mpp_group = NA
                                              ,characteristic_label = NA
                                              ,characteristic_summary_obj = NA
                                              ,characteristic_percent_conforming_obj = NA
-                                             ,characteristic_data_quality_obj = NA){
+                                             ,characteristic_data_quality_obj = NA
+                                             ,sub_label_pre = NA
+                                             ,sub_label_post = NA){
 
+  # get a metric list 
   metric_list <- mpp_group$metric_list
   metric_key <- metric_list[[characteristic_summary_obj]]$measurement_name
+  
   characteristic_summary_value = ifelse(!is.na(characteristic_summary_obj)
                                         ,metric_list[[characteristic_summary_obj]]$get_value(group_id)
                                         ,NA)
-  characteristic_sub_label = ifelse(!is.na(characteristic_percent_conforming_obj)
-                                    ,paste0('Avg '
-                                        ,round(characteristic_summary_value, 0)
-                                        ,' Days Until Scheduled')
+  characteristic_sub_label = ifelse(all(!is.na(characteristic_percent_conforming_obj) # valid percent conforming value
+                                        ,!is.na(characteristic_summary_value) # valid summary value
+                                        ,!is.na(sub_label_pre) # text in front of value
+                                        ,!is.na(sub_label_post)) # text after value 
+                                    ,paste0(sub_label_pre
+                                            ,round(characteristic_summary_value, 0)
+                                            ,sub_label_post)
                                     ,NA)
+  
   characteristic_percent_conforming_value = ifelse(!is.na(characteristic_percent_conforming_obj)
                                                     ,metric_list[[characteristic_percent_conforming_obj]]$get_value(group_id)
                                                     ,NA)
