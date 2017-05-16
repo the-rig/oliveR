@@ -1,8 +1,3 @@
-title: Color Palettes from Node.js Colormap module.
-authors:
-  Bhaskar Karambelkar:
-  href: https://www.karambelkar.info/
-template:
-  package: pkgdown.bvk
+title: oliveR documentation
 params:
   bootswatch: yeti
