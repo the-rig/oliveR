@@ -6,9 +6,9 @@ define_var_attribute <- function(data
                                ,value
                                ,jitter = Sys.getenv("OLIVER_REPLICA_JITTER")){
 
-  data = tbl_person_child_record_count
-  population_member_id = 'id_referral_visit'
-  value = 'child_count_attr'
+  # need to force the data object into a data frame so I can play with it in matrix notation
+  # in the lapply call below
+  data <- data %>% as_data_frame()
 
   mean_value <- lapply(data[,value], mean, na.rm = TRUE)
 
