@@ -241,15 +241,18 @@ build_all_metrics <- function(
 
   referral_attr_id_organization <- define_var_attribute(data = tbl_referral_organization
                                                         ,population_member_id = 'id_referral_visit'
-                                                        ,value = 'id_organization')
+                                                        ,value = 'id_organization'
+                                                        ,jitter = FALSE)
 
   referral_attr_child_count <- define_var_attribute(tbl_person_child_record_count
                                                     ,'id_referral_visit'
-                                                    ,'child_count_attr')
+                                                    ,'child_count_attr'
+                                                    ,jitter = jitter)
 
   referral_visit_attendance <- define_var_attribute(tbl_visit_reports
                                                     ,'id_referral_visit'
-                                                    ,'visitation_attended')
+                                                    ,'visitation_attended'
+                                                    ,jitter = jitter)
 
   ## Define Events
 
