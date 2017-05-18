@@ -1,9 +1,10 @@
 build_all_metrics <- function(
     dbname = Sys.getenv("OLIVER_REPLICA_DBNAME"),
-    host = Sys.getenv("OLIVER_REPLICA_HOST"),    
+    host = Sys.getenv("OLIVER_REPLICA_HOST"),
     user = Sys.getenv("OLIVER_REPLICA_USER"),
     password = Sys.getenv("OLIVER_REPLICA_PASSWORD"),
-    port = Sys.getenv("OLIVER_REPLICA_PORT"),    
+    port = Sys.getenv("OLIVER_REPLICA_PORT"),
+    jitter = Sys.getenv("OLIVER_REPLICA_JITTER"),
     measurement_window = 180,
     measurement_window_start = 20170301
 )
@@ -17,17 +18,17 @@ build_all_metrics <- function(
   )
 
   dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
-  
-  # for future use 
+
+  # for future use
   #con <- oliver_replica_connect()
-  
-  
+
+
   ###########################################
   # visit reports                           #
   ###########################################
-  
+
   message('tbl_visit_reports...', appendLF = FALSE)
-  
+
   tbl_service_referrals <- tbl(con, 'ServiceReferrals') %>%
     select(id
            ,organizationId
@@ -38,7 +39,7 @@ build_all_metrics <- function(
            ,is.na(deletedAt)) %>%
     select(-isCurrentVersion, -deletedAt) %>%
     as_data_frame()
-  
+
   tbl_visit_reports_raw <- tbl(con, 'VisitReports') %>%
     select(id
            ,serviceReferralId
@@ -54,23 +55,23 @@ build_all_metrics <- function(
            ,dateNormalized > (lubridate::now(tzone = 'America/Los_Angeles') - lubridate::days(measurement_window))
            ,dateNormalized > lubridate::ymd(measurement_window_start)
     )
-  
+
   tbl_visit_reports <- inner_join(tbl_service_referrals
                                  ,tbl_visit_reports_raw
                                  ,by = 'serviceReferralId') %>%
     mutate(visitation_attended = ifelse(is.na(cancellationType), TRUE, FALSE)
            ,id_referral_visit = serviceReferralId)
-  
+
   message(' complete')
-  
+
 
   ###########################################
   #ReferralAcceptedDate CTE is equivilant to#
   ###########################################
-  
+
   # get the last date that a referral was requested
   message('tbl_first_referral_requested_ver_max...', appendLF = FALSE)
-  
+
   tbl_first_referral_requested_ver_max <- tbl(con, 'ServiceReferrals') %>%
     select(id
            ,versionId
@@ -82,11 +83,11 @@ build_all_metrics <- function(
     summarise(versionId = max(versionId))
 
   message(' complete')
-  
-  
+
+
   # get the first date that a referral was requested, among max request dates
   message('tbl_first_referral_accepted_ver_min...', appendLF = FALSE)
-  
+
   tbl_first_referral_accepted_ver_min <- tbl(con, 'ServiceReferrals') %>%
     select(id
            ,versionId
@@ -99,11 +100,11 @@ build_all_metrics <- function(
            ,versionId.x > coalesce(versionId.y, 1)) %>%
     group_by(id) %>%
     summarise(versionId = min(versionId.x))
-  
+
   message(' complete')
-  
+
   message('tbl_referral_acceptance_events...', appendLF = FALSE)
-  
+
   tbl_referral_acceptance_events <- tbl(con, 'ServiceReferrals') %>%
     select(id
            ,referralReason
@@ -119,11 +120,11 @@ build_all_metrics <- function(
            ,dt_referral_acceptance = updatedAt)
 
   message(' complete')
-  
+
   ############################################
   #ReferralScheduledDate CTE is equivilant to#
   ############################################
-  
+
   # get the first date that a referral was scheduled
   message('tbl_first_referral_scheduling_ver_min...', appendLF = FALSE)
   tbl_first_referral_scheduling_ver_min <- tbl(con, 'ServiceReferrals') %>%
@@ -137,8 +138,8 @@ build_all_metrics <- function(
     summarise(versionId = min(versionId))
 
   message(' complete')
-  
-  
+
+
   message('tbl_referral_scheduling_events...', appendLF = FALSE)
   tbl_referral_scheduling_events <- tbl(con, 'ServiceReferrals') %>%
     inner_join(tbl_first_referral_scheduling_ver_min, by = c("versionId", "id")) %>%
@@ -148,18 +149,18 @@ build_all_metrics <- function(
     filter(referralReason == 'Initial') %>%
     rename(id_referral_visit = id
            ,dt_referral_scheduled = updatedAt)
-  
+
   message(' complete')
-  
-  
+
+
   ##############################################
   #FirstScheduledVisitDate CTE is equivilant to#
   ##############################################
-  
+
   # until dplyr gets better at parsing json fields
   # any measure elements which are dependent on json fields
   # will utilize raw SQL
-  
+
   message('tbl_scheduling_events_initial...', appendLF = FALSE)
   tbl_scheduling_events <- dbGetQuery(con$con
                                       ,'
@@ -171,20 +172,20 @@ build_all_metrics <- function(
                                       and \"deletedAt\" IS NULL
                                       and \"referralReason\" = \'Initial\'
                                       ')
-  
+
   tbl_scheduling_events_initial <- tbl_scheduling_events %>%
     group_by(id_referral_visit) %>%
     summarise(dt_scheduled_visit_initial = min(visitstartdatenormalized))
-  
+
   message(' complete')
-  
-  
+
+
   ###########################################
   #NumberOfChildrenOnSR CTE is equivilant to#
   ###########################################
-  
+
   message('tbl_person_child_record_count...', appendLF = FALSE)
-  
+
   tbl_person_child_record_count <- dbGetQuery(con$con
                                               ,'
                                               select
@@ -204,15 +205,15 @@ build_all_metrics <- function(
                                               ') %>%
     group_by(id_referral_visit) %>%
     summarise(child_count_attr = max(child_record))
-  
+
   message(' complete')
-  
+
   ################
   #Organizations #
   ################
-  
+
   message('tbl_referral_organization...', appendLF = FALSE)
-  
+
   tbl_referral_organization <- tbl(con, 'ServiceReferrals') %>%
     select(id
            ,organizationId
@@ -227,47 +228,47 @@ build_all_metrics <- function(
            ,id_organization
            ,name) %>%
     filter(name != 'Partners for Our Children')
-  
+
   message(' complete')
-  
+
   ##########################
   #  Variable Definitions  #
   ##########################
-  
+
   message('building variable definitions...', appendLF = FALSE)
-  
+
   ## Define Attributes
-  
+
   referral_attr_id_organization <- define_var_attribute(data = tbl_referral_organization
                                                         ,population_member_id = 'id_referral_visit'
                                                         ,value = 'id_organization')
-  
+
   referral_attr_child_count <- define_var_attribute(tbl_person_child_record_count
                                                     ,'id_referral_visit'
                                                     ,'child_count_attr')
-  
+
   referral_visit_attendance <- define_var_attribute(tbl_visit_reports
                                                     ,'id_referral_visit'
                                                     ,'visitation_attended')
-  
+
   ## Define Events
-  
+
   referral_event_acceptance <- define_var_event(tbl_referral_acceptance_events
                                                 ,'id_referral_visit'
                                                 ,'dt_referral_acceptance')
-  
-  
+
+
   referral_event_scheduling <- define_var_event(tbl_referral_scheduling_events
                                                 ,'id_referral_visit'
                                                 ,'dt_referral_scheduled')
-  
+
   referral_event_first_scheduled_visit <- define_var_event(tbl_scheduling_events_initial
                                                            ,'id_referral_visit'
                                                            ,'dt_scheduled_visit_initial')
-  
-  
+
+
   ## Define Periods
-  
+
   referral_period_acceptance_to_schedule <- define_var_period(
     event_start_tibble = referral_event_acceptance
     ,event_stop_tibble = referral_event_scheduling
@@ -277,8 +278,9 @@ build_all_metrics <- function(
     ,exclusions = list_holidays_and_weekends()
     ,period_name = 'acceptance_to_schedule'
     ,period_target = 3
+    ,jitter = jitter
   )
-  
+
   referral_period_acceptance_to_first_scheduled <- define_var_period(
     event_start_tibble = referral_event_acceptance
     ,event_stop_tibble = referral_event_first_scheduled_visit
@@ -288,29 +290,30 @@ build_all_metrics <- function(
     ,exclusions = list_holidays_and_weekends()
     ,period_name = 'acceptance_to_first_scheduled'
     ,period_target = 7
+    ,jitter = jitter
   )
-  
+
   ## Define *Variable* Attributes
-  
+
   referral_period_acceptance_to_schedule_nas <- referral_period_acceptance_to_schedule[[2]] %>%
     mutate(valid_data = ifelse(is.na(period_days), FALSE, TRUE)) %>%
     select(-period_days)
-    
+
   referral_period_acceptance_to_first_scheduled_nas <- referral_period_acceptance_to_first_scheduled[[2]] %>%
     mutate(valid_data = ifelse(is.na(period_days), FALSE, TRUE)) %>%
     select(-period_days)
-    
-  
+
+
   message(' complete')
-  
+
   #######################################
   #  Varset Definition & Aggregation    #
   #######################################
-  
+
   pcv_performance_monitoring <- metric_group$new()
-  
+
   message('building and aggregating varsets...', appendLF = FALSE)
-  
+
   inner_join(referral_period_acceptance_to_schedule[[2]]
                                              ,referral_attr_id_organization
                                              ,by = 'id_referral_visit') %>%
@@ -325,11 +328,11 @@ build_all_metrics <- function(
                                     ,measurement_rounding = 1
                                     ) %>%
     pcv_performance_monitoring$metric_add(.)
-  
+
   inner_join(referral_period_acceptance_to_schedule[[1]]
                                               ,referral_attr_id_organization
                                               ,by = 'id_referral_visit') %>%
-    select(-id_referral_visit) %>%    
+    select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean"), na.rm = TRUE) %>%
     metric_performance_provider$new(.
@@ -337,14 +340,14 @@ build_all_metrics <- function(
                                     ,organization_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_schedule'
                                     ,measurement_format = 'percent'
-                                    ,measurement_rounding = 0                     
+                                    ,measurement_rounding = 0
                                     ) %>%
     pcv_performance_monitoring$metric_add(.)
-  
+
   inner_join(referral_period_acceptance_to_schedule_nas
              ,referral_attr_id_organization
              ,by = 'id_referral_visit') %>%
-    select(-id_referral_visit) %>%    
+    select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean")) %>%
     metric_performance_provider$new(.
@@ -352,14 +355,14 @@ build_all_metrics <- function(
                                     ,organization_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_schedule'
                                     ,measurement_format = 'percent'
-                                    ,measurement_rounding = 0                     
+                                    ,measurement_rounding = 0
     ) %>%
     pcv_performance_monitoring$metric_add(.)
-  
+
   inner_join(referral_period_acceptance_to_first_scheduled[[2]]
                                                 ,referral_attr_id_organization
                                                 ,by = 'id_referral_visit') %>%
-    select(-id_referral_visit) %>%    
+    select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean"), na.rm = TRUE) %>%
     metric_performance_provider$new(.
@@ -367,14 +370,14 @@ build_all_metrics <- function(
                                     ,organization_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_first_visit'
                                     ,measurement_format = 'numeric'
-                                    ,measurement_rounding = 1                                    
+                                    ,measurement_rounding = 1
                                     ) %>%
     pcv_performance_monitoring$metric_add(.)
-  
+
   inner_join(referral_period_acceptance_to_first_scheduled[[1]]
                                                     ,referral_attr_id_organization
                                                     ,by = 'id_referral_visit') %>%
-    select(-id_referral_visit) %>%    
+    select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean"), na.rm = TRUE) %>%
     metric_performance_provider$new(.
@@ -382,14 +385,14 @@ build_all_metrics <- function(
                                     ,organization_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_first_visit'
                                     ,measurement_format = 'percent'
-                                    ,measurement_rounding = 0                                    
+                                    ,measurement_rounding = 0
                                     ) %>%
     pcv_performance_monitoring$metric_add(.)
-  
+
   inner_join(referral_period_acceptance_to_first_scheduled_nas
              ,referral_attr_id_organization
              ,by = 'id_referral_visit') %>%
-    select(-id_referral_visit) %>%    
+    select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean")) %>%
     metric_performance_provider$new(.
@@ -397,10 +400,10 @@ build_all_metrics <- function(
                                     ,organization_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_first_visit'
                                     ,measurement_format = 'percent'
-                                    ,measurement_rounding = 0                     
+                                    ,measurement_rounding = 0
     ) %>%
     pcv_performance_monitoring$metric_add(.)
-  
+
   inner_join(referral_attr_child_count
                                   ,referral_attr_id_organization
                                   ,by = 'id_referral_visit') %>%
@@ -414,16 +417,16 @@ build_all_metrics <- function(
                                     ,organization_key = 'id_organization'
                                     ,measurement_name = 'child_count_value'
                                     ,measurement_format = 'numeric'
-                                    ,measurement_rounding = 1                                    
+                                    ,measurement_rounding = 1
                                     ) %>%
     pcv_performance_monitoring$metric_add(.)
-  
+
   inner_join(referral_visit_attendance
              ,referral_attr_id_organization
              ,by = 'id_referral_visit') %>%
     rename(attr_visit_attendance = attr_values.x
-           ,id_organization = attr_values.y) %>%    
-    select(-id_referral_visit) %>%    
+           ,id_organization = attr_values.y) %>%
+    select(-id_referral_visit) %>%
     group_by(id_organization) %>%
     summarise_all(c("mean"), na.rm = TRUE) %>%
     metric_performance_provider$new(.
@@ -431,31 +434,28 @@ build_all_metrics <- function(
                                     ,organization_key = 'id_organization'
                                     ,measurement_name = 'attendance_per_scheduled_visit'
                                     ,measurement_format = 'percent'
-                                    ,measurement_rounding = 0                     
+                                    ,measurement_rounding = 0
     ) %>%
     pcv_performance_monitoring$metric_add(.)
-  
+
   message(' complete')
-  
+
   message('saving objects to file. file exists?...', appendLF = FALSE)
-  
+
   file_path <- paste0(system.file('extdata'
                                   ,package = 'oliveR')
                       ,'/'
                       ,lazyeval::expr_text(pcv_performance_monitoring)
   )
-  
+
   saveRDS(object = pcv_performance_monitoring
           ,file = file_path)
-  
+
   message(paste0(' '
                  ,file.exists(file_path))
   )
 
 }
-  
-  
-  
 
 
 
@@ -469,4 +469,7 @@ build_all_metrics <- function(
 
 
 
-  
+
+
+
+
