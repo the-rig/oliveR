@@ -29,3 +29,6 @@ Depends:
     ,grid
     ,grDevices
     ,gridSVG
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
