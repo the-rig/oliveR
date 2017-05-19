@@ -16,7 +16,8 @@ Sys.setenv(OLIVER_REPLICA_DBNAME = "oliver_replica"
            ,OLIVER_REPLICA_HOST = "10.200.10.1"
            ,OLIVER_REPLICA_USER = "mienkoja"
            ,OLIVER_REPLICA_PORT = "5432"
-           ,OLIVER_REPLICA_PASSWORD = "my_password")
+           ,OLIVER_REPLICA_PASSWORD = "my_password"
+           ,OLIVER_REPLICA_JITTER = TRUE)
 ```
 
 ## Prerequisites for Windows 
@@ -29,7 +30,7 @@ oliveR can be installed from from github with:
 
 ```{r, eval = FALSE}
 # install.packages("devtools")
-devtools::install_github("hadley/pkgdown")
+devtools::install_github("the-rig/oliveR")
 ```
 
 ## Usage
