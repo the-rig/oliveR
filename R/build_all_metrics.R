@@ -19,10 +19,6 @@ build_all_metrics <- function(
 
   dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
 
-  # for future use
-  #con <- oliver_replica_connect()
-
-
   ###########################################
   # visit reports                           #
   ###########################################
@@ -240,18 +236,18 @@ build_all_metrics <- function(
   ## Define Attributes
 
   referral_attr_id_organization <- define_var_attribute(data = tbl_referral_organization
-                                                        ,population_member_id = 'id_referral_visit'
+                                                        ,id = 'id_referral_visit'
                                                         ,value = 'id_organization'
                                                         ,jitter = FALSE)
 
   referral_attr_child_count <- define_var_attribute(tbl_person_child_record_count
-                                                    ,'id_referral_visit'
-                                                    ,'child_count_attr'
+                                                    ,id = 'id_referral_visit'
+                                                    ,value = 'child_count_attr'
                                                     ,jitter = jitter)
 
   referral_visit_attendance <- define_var_attribute(tbl_visit_reports
-                                                    ,'id_referral_visit'
-                                                    ,'visitation_attended'
+                                                    ,id = 'id_referral_visit'
+                                                    ,value = 'visitation_attended'
                                                     ,jitter = jitter)
 
   ## Define Events
@@ -277,7 +273,7 @@ build_all_metrics <- function(
     ,event_stop_tibble = referral_event_scheduling
     ,event_start_var = 'dt_referral_acceptance'
     ,event_stop_var = 'dt_referral_scheduled'
-    ,population_member_id = 'id_referral_visit'
+    ,id = 'id_referral_visit'
     ,exclusions = list_holidays_and_weekends()
     ,period_name = 'acceptance_to_schedule'
     ,period_target = 3
@@ -289,7 +285,7 @@ build_all_metrics <- function(
     ,event_stop_tibble = referral_event_first_scheduled_visit
     ,event_start_var = 'dt_referral_acceptance'
     ,event_stop_var = 'dt_scheduled_visit_initial'
-    ,population_member_id = 'id_referral_visit'
+    ,id = 'id_referral_visit'
     ,exclusions = list_holidays_and_weekends()
     ,period_name = 'acceptance_to_first_scheduled'
     ,period_target = 7
@@ -313,7 +309,7 @@ build_all_metrics <- function(
   #  Varset Definition & Aggregation    #
   #######################################
 
-  pcv_performance_monitoring <- metric_group$new()
+  pcv_performance_monitoring <- measurement_group$new()
 
   message('building and aggregating varsets...', appendLF = FALSE)
 
@@ -323,14 +319,14 @@ build_all_metrics <- function(
     select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean"), na.rm = TRUE) %>%
-    metric_performance_provider$new(.
+    measurement_single_value$new(.
                                     ,metric_key = 'period_days'
-                                    ,organization_key = 'attr_values'
+                                    ,group_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_schedule'
                                     ,measurement_format = 'numeric'
                                     ,measurement_rounding = 1
                                     ) %>%
-    pcv_performance_monitoring$metric_add(.)
+    pcv_performance_monitoring$measurement_add(.)
 
   inner_join(referral_period_acceptance_to_schedule[[1]]
                                               ,referral_attr_id_organization
@@ -338,14 +334,14 @@ build_all_metrics <- function(
     select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean"), na.rm = TRUE) %>%
-    metric_performance_provider$new(.
+    measurement_single_value$new(.
                                     ,metric_key = 'met_target'
-                                    ,organization_key = 'attr_values'
+                                    ,group_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_schedule'
                                     ,measurement_format = 'percent'
                                     ,measurement_rounding = 0
                                     ) %>%
-    pcv_performance_monitoring$metric_add(.)
+    pcv_performance_monitoring$measurement_add(.)
 
   inner_join(referral_period_acceptance_to_schedule_nas
              ,referral_attr_id_organization
@@ -353,14 +349,14 @@ build_all_metrics <- function(
     select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean")) %>%
-    metric_performance_provider$new(.
+    measurement_single_value$new(.
                                     ,metric_key = 'valid_data'
-                                    ,organization_key = 'attr_values'
+                                    ,group_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_schedule'
                                     ,measurement_format = 'percent'
                                     ,measurement_rounding = 0
     ) %>%
-    pcv_performance_monitoring$metric_add(.)
+    pcv_performance_monitoring$measurement_add(.)
 
   inner_join(referral_period_acceptance_to_first_scheduled[[2]]
                                                 ,referral_attr_id_organization
@@ -368,14 +364,14 @@ build_all_metrics <- function(
     select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean"), na.rm = TRUE) %>%
-    metric_performance_provider$new(.
+    measurement_single_value$new(.
                                     ,metric_key = 'period_days'
-                                    ,organization_key = 'attr_values'
+                                    ,group_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_first_visit'
                                     ,measurement_format = 'numeric'
                                     ,measurement_rounding = 1
                                     ) %>%
-    pcv_performance_monitoring$metric_add(.)
+    pcv_performance_monitoring$measurement_add(.)
 
   inner_join(referral_period_acceptance_to_first_scheduled[[1]]
                                                     ,referral_attr_id_organization
@@ -383,14 +379,14 @@ build_all_metrics <- function(
     select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean"), na.rm = TRUE) %>%
-    metric_performance_provider$new(.
+    measurement_single_value$new(.
                                     ,metric_key = 'met_target'
-                                    ,organization_key = 'attr_values'
+                                    ,group_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_first_visit'
                                     ,measurement_format = 'percent'
                                     ,measurement_rounding = 0
                                     ) %>%
-    pcv_performance_monitoring$metric_add(.)
+    pcv_performance_monitoring$measurement_add(.)
 
   inner_join(referral_period_acceptance_to_first_scheduled_nas
              ,referral_attr_id_organization
@@ -398,14 +394,14 @@ build_all_metrics <- function(
     select(-id_referral_visit) %>%
     group_by(attr_values) %>%
     summarise_all(c("mean")) %>%
-    metric_performance_provider$new(.
+    measurement_single_value$new(.
                                     ,metric_key = 'valid_data'
-                                    ,organization_key = 'attr_values'
+                                    ,group_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_first_visit'
                                     ,measurement_format = 'percent'
                                     ,measurement_rounding = 0
     ) %>%
-    pcv_performance_monitoring$metric_add(.)
+    pcv_performance_monitoring$measurement_add(.)
 
   inner_join(referral_attr_child_count
                                   ,referral_attr_id_organization
@@ -415,14 +411,14 @@ build_all_metrics <- function(
     select(-id_referral_visit) %>%
     group_by(id_organization) %>%
     summarise_all(c("mean"), na.rm = TRUE) %>%
-    metric_performance_provider$new(.
+    measurement_single_value$new(.
                                     ,metric_key = 'attr_child_count'
-                                    ,organization_key = 'id_organization'
+                                    ,group_key = 'id_organization'
                                     ,measurement_name = 'child_count_value'
                                     ,measurement_format = 'numeric'
                                     ,measurement_rounding = 1
                                     ) %>%
-    pcv_performance_monitoring$metric_add(.)
+    pcv_performance_monitoring$measurement_add(.)
 
   inner_join(referral_visit_attendance
              ,referral_attr_id_organization
@@ -432,14 +428,14 @@ build_all_metrics <- function(
     select(-id_referral_visit) %>%
     group_by(id_organization) %>%
     summarise_all(c("mean"), na.rm = TRUE) %>%
-    metric_performance_provider$new(.
+    measurement_single_value$new(.
                                     ,metric_key = 'attr_visit_attendance'
-                                    ,organization_key = 'id_organization'
+                                    ,group_key = 'id_organization'
                                     ,measurement_name = 'attendance_per_scheduled_visit'
                                     ,measurement_format = 'percent'
                                     ,measurement_rounding = 0
     ) %>%
-    pcv_performance_monitoring$metric_add(.)
+    pcv_performance_monitoring$measurement_add(.)
 
   message(' complete')
 

@@ -5,7 +5,8 @@
 \title{Create a vector of 24 hour Intervals \pkg{lubridate} from \code{oliver_replica} write a single file}
 \usage{
 list_holidays_and_weekends(from_date = "01-01-2011", to_date = "01-01-2111",
-  country_filter = "usa", region_filter = "Washington")
+  country_filter = "usa", region_filter = "Washington",
+  tz = "America/Los_Angeles")
 }
 \arguments{
 \item{from_date}{A character string specifying the start date of the \code{Interval} vector in the format \code{\%m-\%d-\%Y}. Defaults to \code{01-01-2011}}
@@ -17,7 +18,7 @@ list_holidays_and_weekends(from_date = "01-01-2011", to_date = "01-01-2111",
 \item{region_filter}{A character string specifying region, of the country, of the holidays as required by the Enrico service. Defaults to 'Washington'.}
 }
 \value{
-A vector of \code{Interval} objects.
+A vector of lubridate \code{Interval} objects.
 }
 \description{
 This function is used to generate a vector of holiday and weekend \code{Interval} objects as defined by \pkg{lubridate}. It requires an active internet connection as it makes use of the Enrico service available at \link{http://www.kayaposoft.com/enrico/} to determine holidays for a given locality. This is used to exclude weekends and holidays from \code{Duration} and \code{Period} calculations.

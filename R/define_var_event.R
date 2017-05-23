@@ -3,13 +3,14 @@
 
 
 define_var_event <- function(data
-                                ,population_member_id
-                                ,value_date){
-  dots <- setNames(list(lazyeval::interp(~ as.POSIXct(x, tz = 'America/Los_Angeles')
+                             ,id
+                             ,value_date
+                             ,tz = 'America/Los_Angeles'){
+  dots <- setNames(list(lazyeval::interp(~ as.POSIXct(x, tz = tz)
                                ,x = as.name(value_date)))
                    ,value_date)
   event <- select_(data
-                   ,population_member_id
+                   ,id
                    ,value_date) %>%
     as_data_frame() %>%
     mutate_(.

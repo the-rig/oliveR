@@ -15,33 +15,36 @@ define_var_period <- function(event_start_tibble
                                  ,event_stop_tibble
                                  ,event_start_var
                                  ,event_stop_var
-                                 ,population_member_id
-                              ,period_name
+                                 ,id
+                                 ,period_name
                                  ,exclusions = list_holidays_and_weekends()
                                  ,period_target = NA
                                  ,overwrite_negative = TRUE
                               ,jitter = Sys.getenv("OLIVER_REPLICA_JITTER")){
 
+  # set names for the tibble
   dots1 <- setNames(list(lazyeval::interp(~ lubridate::interval(x, y)
-                                ,x = as.name(event_start_var)
-                                ,y = as.name(event_stop_var)
-  ))
-  ,'interval_raw')
+                                          ,x = as.name(event_start_var)
+                                          ,y = as.name(event_stop_var)))
+                    ,'interval_raw')
 
+  # initialize period_dat tibble by joining the two event tibbles together
   period_dat <- inner_join(event_start_tibble
                            ,event_stop_tibble) %>%
-    select_(population_member_id
+    select_(id
             ,event_start_var
             ,event_stop_var) %>%
     mutate_(., .dots = dots1) %>%
     as_data_frame()
 
+  # add a column to period_dat based on the exclusions param
   period_dat$interval_delta <- NA
 
   for (i in 1:nrow(period_dat)){
     period_dat$interval_delta[i] <- sum(exclusions %within% period_dat$interval_raw[i])
   }
 
+  # set names for the second table
   dots2 <- setNames(list(lazyeval::interp(~ x
                                 ,x = quote(period_all))
                          ,lazyeval::interp(~ y
@@ -49,6 +52,7 @@ define_var_period <- function(event_start_tibble
                     ,c(period_name, paste0(period_name, '_days'))
   )
 
+  # put everything together
   period_dat_value <- period_dat %>%
     mutate(period_all = as.period(interval_raw, unit = 'days') - days(interval_delta)
            ,period_days = as.numeric(period_all, 'days')
@@ -56,11 +60,13 @@ define_var_period <- function(event_start_tibble
            ,negative_interval = int_length(interval_raw) < 0
     ) %>%
     mutate_(., .dots = dots2) %>%
+    # jitter the values if TRUE
+    # this will also jitter the values below
     mutate(period_days = ifelse(overwrite_negative & negative_interval, NA, period_days)
            ,period_days = if(jitter){period_days + rbinom(n = n()
                                                           ,size = period_target
                                                           ,prob = runif(1))} else period_days) %>%
-    select_(population_member_id
+    select_(id
             ,quote(period_days))
 
   period_dat_target <- period_dat %>%
@@ -71,7 +77,7 @@ define_var_period <- function(event_start_tibble
     ) %>%
     mutate_(., .dots = dots2) %>%
     mutate(met_target = ifelse(overwrite_negative & negative_interval, NA, met_target)) %>%
-    select_(population_member_id
+    select_(id
             ,quote(met_target)
     )
   return(list(period_dat_target

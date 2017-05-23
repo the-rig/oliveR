@@ -2,7 +2,7 @@
 #' @export
 
 define_var_attribute <- function(data
-                               ,population_member_id
+                               ,id
                                ,value
                                ,jitter = Sys.getenv("OLIVER_REPLICA_JITTER")){
 
@@ -10,31 +10,39 @@ define_var_attribute <- function(data
   # in the lapply call below
   data <- data %>% as_data_frame()
 
+  # calculate the mean of the available data
   mean_value <- lapply(data[,value], mean, na.rm = TRUE)
 
+  # set names for the df
   dots <- setNames(list(lazyeval::interp(~ x
                                ,x = as.name(value)))
                    ,value)
+
+  # initialize the attr table
   attribute <- select_(data
-                       ,population_member_id
+                       ,id
                        ,value) %>%
     as_data_frame() %>%
     mutate_(.
             ,.dots = dots) %>%
     rename_(., .dots = setNames(value, "attr_values"))
 
+  # if TRUE, apply jitter for logical values
   if (lapply(data[,value], class) == 'logical') {
 
     attribute <- attribute %>%
       mutate(attr_values = if(jitter){runif(n())} else attr_values
              ,attr_values = ifelse(attr_values > mean_value, TRUE, FALSE))
 
+  # if TRUE, apply jitter for integer and double values
   } else if (any(lapply(data[,value], class) == 'integer'
                      ,lapply(data[,value], class) == 'double')) {
     attribute <- attribute %>%
       mutate(attr_values = if(jitter){attr_values + rbinom(n = n()
-                                                           ,size = round(as.numeric(mean_value), digits = 0)
-                                                           ,prob = runif(1))} else attr_values)
+                                                           ,size = round(as.numeric(mean_value)
+                                                                         ,digits = 0)
+                                                           ,prob = runif(1))
+        } else attr_values)
   }
 
   return(attribute)
