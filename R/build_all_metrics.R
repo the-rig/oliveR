@@ -25,7 +25,12 @@ build_all_metrics <- function(
     port = port
   )
 
-  lapply(X = import_fncs
+
+  message('importing data')
+  op <- pboptions(type="txt")
+
+  ptm_import <- proc.time()
+  system.time(pblapply(X = import_fncs
          ,FUN = do.call
          ,list(con = con
                ,measurement_window = measurement_window
@@ -34,39 +39,8 @@ build_all_metrics <- function(
                )
 
          )
-
-
-  # message('importing data', appendLF = FALSE)
-  #
-  # import_referral_child_record_count(con = con)
-  #
-  # message(' .', appendLF = FALSE)
-  #
-  # import_visits_initial_as_sceduled(con = con)
-  #
-  # message(' .', appendLF = FALSE)
-  #
-  # import_referral_scheduling_events(con = con)
-  #
-  # message(' .', appendLF = FALSE)
-  #
-  # import_referral_organization(con = con)
-  #
-  # message(' .', appendLF = FALSE)
-  #
-  # import_visit_reports(con = con
-  #                      , measurement_window = measurement_window
-  #                      , measurement_window_start = measurement_window_start
-  #                      , tz = tz)
-  #
-  # message(' .', appendLF = FALSE)
-  #
-  # import_referral_acceptance_events(con = con
-  #                                   , measurement_window = measurement_window
-  #                                   , measurement_window_start = measurement_window_start
-  #                                   , tz = tz)
-  #
-  # message(' done')
+  )
+  proc.time() - ptm_import
 
   referral_attr_id_organization <- define_var_attribute(data = tbl_referral_organization
                                                         ,id = 'id_referral_visit'
