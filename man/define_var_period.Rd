@@ -7,7 +7,7 @@
 define_var_period(event_start_tibble, event_stop_tibble, event_start_var,
   event_stop_var, population_member_id, period_name,
   exclusions = list_holidays_and_weekends(), period_target = NA,
-  overwrite_negative = TRUE)
+  overwrite_negative = TRUE, jitter = Sys.getenv("OLIVER_REPLICA_JITTER"))
 }
 \arguments{
 \item{event_start_tibble}{A tibble with a date column representing the start of a period and \code{population_member_id} column.}

@@ -1,6 +1,6 @@
 #' Class providing object with methods for displaying values of measurement varsets
 #'
-#' @name metric_performance_provider_group
+#' @name measurement_group_class
 #' @docType class
 #' @export
 #' @return Object of \code{\link{R6Class}} with methods for returning values and graphs from measurement objects built with this package.
@@ -20,9 +20,10 @@
 
 library(R6)
 
-metric_group <- R6Class("metric_performance_provider_group",
+measurement_group <- R6Class("measurement_group",
         public = list(
-          metric_list = vector(mode="numeric", length=0)
-          ,metric_add = function(...) self$metric_list <- c(self$metric_list, list(...))
+          measurement_list = vector(mode="numeric", length=0)
+          ,measurement_add = function(...) self$measurement_list <- c(self$measurement_list
+                                                                      ,list(...))
         )
 )

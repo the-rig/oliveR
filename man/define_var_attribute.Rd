@@ -4,7 +4,8 @@
 \alias{define_var_attribute}
 \title{Define a tibble attribute variable}
 \usage{
-define_var_attribute(data, population_member_id, value)
+define_var_attribute(data, population_member_id, value,
+  jitter = Sys.getenv("OLIVER_REPLICA_JITTER"))
 }
 \description{
 Define a tibble attribute variable

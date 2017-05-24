@@ -12,6 +12,7 @@ LazyData: TRUE
 RoxygenNote: 6.0.1
 Depends:
     dplyr
+    ,pbapply
     ,ggplot2
     ,RPostgreSQL
     ,feather
