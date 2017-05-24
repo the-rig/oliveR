@@ -6,7 +6,15 @@ build_all_metrics <- function(
     port = Sys.getenv("OLIVER_REPLICA_PORT"),
     jitter = Sys.getenv("OLIVER_REPLICA_JITTER"),
     measurement_window = 180,
-    measurement_window_start = 20170301
+    measurement_window_start = 20170301,
+    tz = 'America/Los_Angeles',
+    import_fncs = list(import_referral_child_record_count
+                        ,import_visits_initial_as_sceduled
+                        ,import_referral_scheduling_events
+                        ,import_referral_organization
+                        ,import_visit_reports
+                        ,import_referral_acceptance_events
+    )
 )
 {
   con <- src_postgres(
@@ -17,230 +25,55 @@ build_all_metrics <- function(
     port = port
   )
 
-  dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
+  lapply(X = import_fncs
+         ,FUN = do.call
+         ,list(con = con
+               ,measurement_window = measurement_window
+               ,measurement_window_start = measurement_window_start
+               ,tz = tz
+               )
 
-  ###########################################
-  # visit reports                           #
-  ###########################################
-
-  message('tbl_visit_reports...', appendLF = FALSE)
-
-  tbl_service_referrals <- tbl(con, 'ServiceReferrals') %>%
-    select(id
-           ,organizationId
-           ,isCurrentVersion
-           ,deletedAt) %>%
-    rename(serviceReferralId = id) %>%
-    filter(isCurrentVersion
-           ,is.na(deletedAt)) %>%
-    select(-isCurrentVersion, -deletedAt) %>%
-    as_data_frame()
-
-  tbl_visit_reports_raw <- tbl(con, 'VisitReports') %>%
-    select(id
-           ,serviceReferralId
-           ,cancellationType
-           ,isCurrentVersion
-           ,deletedAt
-           ,approvedAt
-           ,dateNormalized) %>%
-    as_data_frame() %>%
-    filter(isCurrentVersion
-           ,is.na(deletedAt)
-           ,!is.na(approvedAt)
-           ,dateNormalized > (lubridate::now(tzone = 'America/Los_Angeles') - lubridate::days(measurement_window))
-           ,dateNormalized > lubridate::ymd(measurement_window_start)
-    )
-
-  tbl_visit_reports <- inner_join(tbl_service_referrals
-                                 ,tbl_visit_reports_raw
-                                 ,by = 'serviceReferralId') %>%
-    mutate(visitation_attended = ifelse(is.na(cancellationType), TRUE, FALSE)
-           ,id_referral_visit = serviceReferralId)
-
-  message(' complete')
+         )
 
 
-  ###########################################
-  #ReferralAcceptedDate CTE is equivilant to#
-  ###########################################
-
-  # get the last date that a referral was requested
-  message('tbl_first_referral_requested_ver_max...', appendLF = FALSE)
-
-  tbl_first_referral_requested_ver_max <- tbl(con, 'ServiceReferrals') %>%
-    select(id
-           ,versionId
-           ,referralState
-           ,requestDateNormalized) %>%
-    filter(referralState == 'Requested'
-           ,!is.na(requestDateNormalized)) %>%
-    group_by(id) %>%
-    summarise(versionId = max(versionId))
-
-  message(' complete')
-
-
-  # get the first date that a referral was requested, among max request dates
-  message('tbl_first_referral_accepted_ver_min...', appendLF = FALSE)
-
-  tbl_first_referral_accepted_ver_min <- tbl(con, 'ServiceReferrals') %>%
-    select(id
-           ,versionId
-           ,referralState
-           ,requestDateNormalized) %>%
-    left_join(tbl_first_referral_requested_ver_max
-              ,by = 'id') %>%
-    filter(referralState == 'Accepted'
-           ,!is.na(requestDateNormalized)
-           ,versionId.x > coalesce(versionId.y, 1)) %>%
-    group_by(id) %>%
-    summarise(versionId = min(versionId.x))
-
-  message(' complete')
-
-  message('tbl_referral_acceptance_events...', appendLF = FALSE)
-
-  tbl_referral_acceptance_events <- tbl(con, 'ServiceReferrals') %>%
-    select(id
-           ,referralReason
-           ,updatedAt
-           ,versionId) %>%
-    inner_join(tbl_first_referral_accepted_ver_min, by = c("id", "versionId")) %>%
-    as_data_frame() %>%
-    filter(updatedAt > (lubridate::now(tzone = 'America/Los_Angeles') - lubridate::days(measurement_window))
-           ,updatedAt > lubridate::ymd(measurement_window_start)
-           ,referralReason == 'Initial') %>%
-    select(-versionId) %>%
-    rename(id_referral_visit = id
-           ,dt_referral_acceptance = updatedAt)
-
-  message(' complete')
-
-  ############################################
-  #ReferralScheduledDate CTE is equivilant to#
-  ############################################
-
-  # get the first date that a referral was scheduled
-  message('tbl_first_referral_scheduling_ver_min...', appendLF = FALSE)
-  tbl_first_referral_scheduling_ver_min <- tbl(con, 'ServiceReferrals') %>%
-    select(id
-           ,versionId
-           ,referralState
-           ,requestDateNormalized) %>%
-    filter(referralState == 'Scheduled'
-           ,!is.na(requestDateNormalized)) %>%
-    group_by(id) %>%
-    summarise(versionId = min(versionId))
-
-  message(' complete')
-
-
-  message('tbl_referral_scheduling_events...', appendLF = FALSE)
-  tbl_referral_scheduling_events <- tbl(con, 'ServiceReferrals') %>%
-    inner_join(tbl_first_referral_scheduling_ver_min, by = c("versionId", "id")) %>%
-    select(id
-           ,referralReason
-           ,updatedAt) %>%
-    filter(referralReason == 'Initial') %>%
-    rename(id_referral_visit = id
-           ,dt_referral_scheduled = updatedAt)
-
-  message(' complete')
-
-
-  ##############################################
-  #FirstScheduledVisitDate CTE is equivilant to#
-  ##############################################
-
-  # until dplyr gets better at parsing json fields
-  # any measure elements which are dependent on json fields
-  # will utilize raw SQL
-
-  message('tbl_scheduling_events_initial...', appendLF = FALSE)
-  tbl_scheduling_events <- dbGetQuery(con$con
-                                      ,'
-                                      select
-                                      id id_referral_visit
-                                      ,(json_array_elements(\"visitSchedule\") ->> \'visitStartDateNormalized\'::text)::date visitStartDateNormalized
-                                      from \"ServiceReferrals\"
-                                      where \"isCurrentVersion\" = TRUE
-                                      and \"deletedAt\" IS NULL
-                                      and \"referralReason\" = \'Initial\'
-                                      ')
-
-  tbl_scheduling_events_initial <- tbl_scheduling_events %>%
-    group_by(id_referral_visit) %>%
-    summarise(dt_scheduled_visit_initial = min(visitstartdatenormalized))
-
-  message(' complete')
-
-
-  ###########################################
-  #NumberOfChildrenOnSR CTE is equivilant to#
-  ###########################################
-
-  message('tbl_person_child_record_count...', appendLF = FALSE)
-
-  tbl_person_child_record_count <- dbGetQuery(con$con
-                                              ,'
-                                              select
-                                              id id_referral_visit
-                                              ,row_number () over (
-                                              partition by id
-                                              order by
-                                              json_array_elements(\"childDetails\") ->> \'childAge\'::text
-                                              ,json_array_elements(\"childDetails\") ->> \'childDob\'::text
-                                              ,json_array_elements(\"childDetails\") ->> \'childLastName\'::text
-                                              ,json_array_elements("childDetails") ->> \'childFirstName\'::text
-                                              ) as child_record
-                                              from \"ServiceReferrals\" s
-                                              where \"isCurrentVersion\" = TRUE
-                                              and \"deletedAt\" IS NULL
-                                              and \"referralReason\" = \'Initial\'
-                                              ') %>%
-    group_by(id_referral_visit) %>%
-    summarise(child_count_attr = max(child_record))
-
-  message(' complete')
-
-  ################
-  #Organizations #
-  ################
-
-  message('tbl_referral_organization...', appendLF = FALSE)
-
-  tbl_referral_organization <- tbl(con, 'ServiceReferrals') %>%
-    select(id
-           ,organizationId
-           ,isCurrentVersion
-           ,deletedAt) %>%
-    filter(isCurrentVersion == TRUE
-           ,is.na(deletedAt)) %>%
-    inner_join(tbl(con, 'Organizations'), by = c('organizationId' = 'id')) %>%
-    rename(id_referral_visit = id.x
-           ,id_organization = organizationId) %>%
-    select(id_referral_visit
-           ,id_organization
-           ,name) %>%
-    filter(name != 'Partners for Our Children')
-
-  message(' complete')
-
-  ##########################
-  #  Variable Definitions  #
-  ##########################
-
-  message('building variable definitions...', appendLF = FALSE)
-
-  ## Define Attributes
+  # message('importing data', appendLF = FALSE)
+  #
+  # import_referral_child_record_count(con = con)
+  #
+  # message(' .', appendLF = FALSE)
+  #
+  # import_visits_initial_as_sceduled(con = con)
+  #
+  # message(' .', appendLF = FALSE)
+  #
+  # import_referral_scheduling_events(con = con)
+  #
+  # message(' .', appendLF = FALSE)
+  #
+  # import_referral_organization(con = con)
+  #
+  # message(' .', appendLF = FALSE)
+  #
+  # import_visit_reports(con = con
+  #                      , measurement_window = measurement_window
+  #                      , measurement_window_start = measurement_window_start
+  #                      , tz = tz)
+  #
+  # message(' .', appendLF = FALSE)
+  #
+  # import_referral_acceptance_events(con = con
+  #                                   , measurement_window = measurement_window
+  #                                   , measurement_window_start = measurement_window_start
+  #                                   , tz = tz)
+  #
+  # message(' done')
 
   referral_attr_id_organization <- define_var_attribute(data = tbl_referral_organization
                                                         ,id = 'id_referral_visit'
                                                         ,value = 'id_organization'
                                                         ,jitter = FALSE)
 
-  referral_attr_child_count <- define_var_attribute(tbl_person_child_record_count
+  referral_attr_child_count <- define_var_attribute(tbl_referral_child_record_count
                                                     ,id = 'id_referral_visit'
                                                     ,value = 'child_count_attr'
                                                     ,jitter = jitter)
@@ -261,7 +94,7 @@ build_all_metrics <- function(
                                                 ,'id_referral_visit'
                                                 ,'dt_referral_scheduled')
 
-  referral_event_first_scheduled_visit <- define_var_event(tbl_scheduling_events_initial
+  referral_event_first_scheduled_visit <- define_var_event(tbl_visits_initial_as_sceduled
                                                            ,'id_referral_visit'
                                                            ,'dt_scheduled_visit_initial')
 
@@ -455,20 +288,3 @@ build_all_metrics <- function(
   )
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
