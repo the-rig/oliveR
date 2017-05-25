@@ -49,6 +49,8 @@ import_visit_reports <- function(con
     mutate(visitation_attended = ifelse(is.na(cancellationType), TRUE, FALSE)
            ,id_referral_visit = serviceReferralId)
 
+  #return(tbl_visit_reports)
+
   assign(x = output_name
          ,value = tbl_visit_reports
          ,pos = 1)

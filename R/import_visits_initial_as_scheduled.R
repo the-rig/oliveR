@@ -22,6 +22,8 @@ import_visits_initial_as_scheduled <- function(con
     summarise(dt_scheduled_visit_initial = min(visitstartdatenormalized)) %>%
     as_data_frame()
 
+  #return(tbl_scheduling_events_initial)
+
   assign(x = output_name
          ,value = tbl_scheduling_events_initial
          ,pos = 1)

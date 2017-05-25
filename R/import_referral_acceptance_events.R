@@ -53,6 +53,8 @@ import_referral_acceptance_events <- function(con
              ,dt_referral_acceptance = updatedAt) %>%
       as_data_frame()
 
+  #return(tbl_referral_acceptance_events)
+
   assign(x = output_name
          ,value = tbl_referral_acceptance_events
          ,pos = 1)

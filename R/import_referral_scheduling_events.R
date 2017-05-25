@@ -31,6 +31,8 @@ import_referral_scheduling_events <- function(con
     as_data_frame()
 )
 
+  #return(tbl_referral_scheduling_events)
+
   assign(x = output_name
          ,value = tbl_referral_scheduling_events
          ,pos = 1)
