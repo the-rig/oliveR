@@ -1,4 +1,4 @@
-import_visits_initial_as_sceduled <- function(con
+import_visits_initial_as_scheduled <- function(con
                                               ,output_name = 'tbl_visits_initial_as_sceduled'
                                               ,measurement_window
                                               ,measurement_window_start
