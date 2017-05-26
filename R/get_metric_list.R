@@ -10,24 +10,24 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
   x$acceptance_to_schedule <- create_measurement_dimension_set(group_id = group_id
                                    ,mpp_group = mpp_group
                                    ,characteristic = 'Days Until Visit is Scheduled'
-                                   ,characteristic_label = 'Scheduled Within 3 Days'
+                                   ,characteristic_label = 'Expected Time to Schedule'
                                    ,characteristic_summary_obj = 1
-                                   ,characteristic_percent_conforming_obj = NA
+                                   ,characteristic_percent_conforming_obj = 2
                                    ,characteristic_data_quality_obj = 3
-                                   ,sub_label_pre = 'Avg. '
-                                   ,sub_label_post = ' Days Until Scheduled')
+                                   ,sub_label_pre = ''
+                                   ,sub_label_post = ' Scheduled within 3 Days')
 
   # missing_list <- missing_list_add(x$acceptance_to_schedule$measurement_missing)
   #
   x$acceptance_to_first_visit <- create_measurement_dimension_set(group_id = group_id
                                    ,mpp_group = mpp_group
                                    ,characteristic = 'Days Until First Visit, as Planned'
-                                   ,characteristic_label = 'Visit Planned Within 7 Days'
+                                   ,characteristic_label = 'Expected Time to First Planned Visit'
                                    ,characteristic_summary_obj = 4
-                                   ,characteristic_percent_conforming_obj = NA
+                                   ,characteristic_percent_conforming_obj = 5
                                    ,characteristic_data_quality_obj = 6
-                                   ,sub_label_pre = 'Avg. '
-                                   ,sub_label_post = ' Days Until First Visit')
+                                   ,sub_label_pre = ''
+                                   ,sub_label_post = ' Planned within 7 Days')
 
   # missing_list <- missing_list_add(x$acceptance_to_first_visit$measurement_missing)
   #
