@@ -1,5 +1,5 @@
 import_referral_child_record_count <- function(con
-                                              ,output_name = 'tbl_referral_child_record_count'
+                                              #,output_name = 'tbl_referral_child_record_count'
                                               ,measurement_window
                                               ,measurement_window_start
                                               ,tz) {
@@ -27,10 +27,10 @@ import_referral_child_record_count <- function(con
     summarise(child_count_attr = max(child_record)) %>%
     as_data_frame()
 
-  #return(tbl_referral_child_record_count)
+  return(tbl_referral_child_record_count)
 
-  assign(x = output_name
-         ,value = tbl_referral_child_record_count
-         ,pos = 1)
+  # assign(x = output_name
+  #        ,value = tbl_referral_child_record_count
+  #        ,pos = 1)
 
 }

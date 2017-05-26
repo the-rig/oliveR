@@ -1,10 +1,10 @@
 import_referral_organization <- function(con
-                                              ,output_name = 'tbl_referral_organization'
+                                              #,output_name = 'tbl_referral_organization'
                                          ,measurement_window
                                          ,measurement_window_start
                                          ,tz) {
 
-  #dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
+  dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
 
   tbl_referral_organization <- tbl(con, 'ServiceReferrals') %>%
     select(id
@@ -23,10 +23,10 @@ import_referral_organization <- function(con
            ,name != 'Family Impact Network') %>%
     as_data_frame()
 
-  #return(tbl_referral_organization)
+  return(tbl_referral_organization)
 
-  assign(x = output_name
-         ,value = tbl_referral_organization
-         ,pos = 1)
+  # assign(x = output_name
+  #        ,value = tbl_referral_organization
+  #        ,pos = 1)
 
 }

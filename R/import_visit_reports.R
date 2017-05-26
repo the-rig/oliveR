@@ -1,5 +1,5 @@
 import_visit_reports <- function(con
-                                 ,output_name = 'tbl_visit_reports'
+                                 #,output_name = 'tbl_visit_reports'
                                  ,measurement_window
                                  ,measurement_window_start
                                  ,tz) {
@@ -49,10 +49,10 @@ import_visit_reports <- function(con
     mutate(visitation_attended = ifelse(is.na(cancellationType), TRUE, FALSE)
            ,id_referral_visit = serviceReferralId)
 
-  #return(tbl_visit_reports)
+  return(tbl_visit_reports)
 
-  assign(x = output_name
-         ,value = tbl_visit_reports
-         ,pos = 1)
+  # assign(x = output_name
+  #        ,value = tbl_visit_reports
+  #        ,pos = 1)
 
 }
