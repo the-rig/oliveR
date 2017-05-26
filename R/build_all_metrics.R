@@ -9,7 +9,7 @@ build_all_metrics <- function(
     measurement_window_start = 20170301,
     tz = 'America/Los_Angeles',
     import_fncs = list(import_referral_child_record_count
-                        ,import_visits_initial_as_sceduled
+                        ,import_visits_initial_as_scheduled
                         ,import_referral_scheduling_events
                         ,import_referral_organization
                         ,import_visit_reports
@@ -130,7 +130,7 @@ build_all_metrics <- function(
                                     ,metric_key = 'period_days'
                                     ,group_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_schedule'
-                                    ,measurement_format = 'numeric'
+                                    ,measurement_format = 'days'
                                     ,measurement_rounding = 1
                                     ) %>%
     pcv_performance_monitoring$measurement_add(.)
@@ -175,7 +175,7 @@ build_all_metrics <- function(
                                     ,metric_key = 'period_days'
                                     ,group_key = 'attr_values'
                                     ,measurement_name = 'acceptance_to_first_visit'
-                                    ,measurement_format = 'numeric'
+                                    ,measurement_format = 'days'
                                     ,measurement_rounding = 1
                                     ) %>%
     pcv_performance_monitoring$measurement_add(.)
