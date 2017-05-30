@@ -99,7 +99,7 @@ measurement_variable <- R6Class("measurement_variable"
                                                            ,event_start_var = self$value_col1
                                                            ,event_stop_var = self$value_col2
                                                            ,id = self$id_col
-                                                           ,exclusions = list_holidays_and_weekends()
+                                                           ,exclusions = self$exclusions
                                                            ,period_name = self$name
                                                            ,period_target = self$target
                                                            ,jitter = self$jitter
