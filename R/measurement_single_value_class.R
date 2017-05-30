@@ -29,20 +29,43 @@ measurement_single_value <- R6Class("measurement_single_value",
           ,measurement_format = NULL
           ,measurement_rounding = NULL
           ,measurement_graph = NULL
-          ,initialize = function(aggr_varset = NA
-                                 ,metric_key = NA
-                                 ,group_key = NA
+          ,join_variable_1 = NULL
+          ,join_variable_2 = NULL
+          ,select_var = NULL
+          ,rename_var = NULL
+          ,summary_function = NULL
+          ,na_rm = NULL
+          ,initialize = function(metric_key = NA
+                                 ,group_key = 'id_organization'
                                  ,measurement_name = NA
                                  ,measurement_format = NA
                                  ,measurement_rounding = NA
-                                 ,measurement_graph = NA) {
-            self$aggr_varset <- aggr_varset
+                                 ,measurement_graph = NA
+                                 ,join_variable_1 = NA
+                                 ,join_variable_2 = NA
+                                 ,select_var = NA
+                                 ,rename_var = NA
+                                 ,summary_function = 'mean'
+                                 ,na_rm = TRUE) {
             self$metric_key <- metric_key
             self$group_key <- group_key
             self$measurement_name <- measurement_name
             self$measurement_format <- measurement_format
             self$measurement_rounding <- measurement_rounding
             self$measurement_graph <- measurement_graph
+            self$join_variable_1 <- join_variable_1
+            self$join_variable_2 <- join_variable_2
+            self$select_var <- select_var
+            self$rename_var <- rename_var
+            self$summary_function <- summary_function
+            self$na_rm <- na_rm
+            self$aggr_varset <- summarise_vars(join_variable_1 = self$join_variable_1
+                                                ,join_variable_2 = self$join_variable_2
+                                                ,select_var = self$select_var
+                                                ,rename_var = self$rename_var
+                                                ,group_key = self$group_key
+                                                ,summary_function = self$summary_function
+                                                ,na_rm = self$na_rm)
           }
           ,get_value = function(group_id) {
             filter_criteria <- interp(~ which_column == group_id
