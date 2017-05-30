@@ -70,13 +70,19 @@ measurement_variable <- R6Class("measurement_variable"
                       self$measurement_window <- measurement_window
                       self$measurement_window_start <- measurement_window_start
                       self$tz <- tz
-                      self$data_in <- do.call(self$data_in
-                              ,args = list(con = self$con
-                                           #,output_name = self$data_in_name
-                                           ,measurement_window = self$measurement_window
-                                           ,measurement_window_start = self$measurement_window_start
-                                           ,tz = self$tz
-                                           ))
+                      if(is_function(import_visits_initial_as_scheduled)){
+                        self$data_in <- do.call(self$data_in
+                                                ,args = list(con = self$con
+                                                             #,output_name = self$data_in_name
+                                                             ,measurement_window = self$measurement_window
+                                                             ,measurement_window_start = self$measurement_window_start
+                                                             ,tz = self$tz
+                                                             )
+                                                )
+                      } else {
+                        self$data_in <- data_in
+                      }
+
                       # need to map jitter down to this function
                       if (self$type == 'event'){
                         self$data_out_identity <- define_var_event(data = self$data_in
