@@ -80,8 +80,14 @@ define_var_period <- function(event_start_tibble
     select_(id
             ,quote(met_target)
     )
+
+  period_dat_quality <- period_dat_value %>%
+    mutate(valid_data = ifelse(is.na(period_days), FALSE, TRUE)) %>%
+    select(-period_days)
+
   return(list(period_dat_target
-              ,period_dat_value)
+              ,period_dat_value
+              ,period_dat_quality)
   )
 
 }
