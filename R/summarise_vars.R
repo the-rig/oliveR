@@ -3,11 +3,30 @@ summarise_vars <- function (join_variable_1 = referral_attr_child_count
                             ,join_variable_2 = referral_attr_id_organization
                             ,select_var = c('attr_values.x', 'attr_values.y')
                             ,rename_var = c('attr_child_count', 'id_organization')
-                            ,group = 'id_organization'
-                            ,summary_function) {
+                            ,group_key = 'id_organization'
+                            ,data_out_type = 'identity'
+                            ,summary_function = 'mean'
+                            ,na_rm = TRUE) {
 
   dots <- setNames(as.list(select_var)
                    ,rename_var)
+
+  # define the type of data_out we are looking for
+
+  if(data_out_type == 'identity'){
+    data_out1 <- join_variable_1$data_out_identity
+    data_out2 <- join_variable_2$data_out_identity
+  } else if(data_out_type == 'performance'){
+    data_out1 <- join_variable_1$data_out_performance
+    data_out2 <- join_variable_2$data_out_performance
+  } else if(data_out_type == 'quality'){
+    data_out1 <- join_variable_1$data_out_quality
+    data_out2 <- join_variable_2$data_out_quality
+  } else {
+    stop(paste0("data_out_type of, ", data_out_type, " not currently defined"))
+  }
+
+
 
   # if the id_cols of both variables are equal, by_def is set to join_variable_1$id_col
   if(join_variable_1$id_col != join_variable_2$id_col) {
@@ -23,23 +42,24 @@ summarise_vars <- function (join_variable_1 = referral_attr_child_count
     stop("if rename_var specified, it must have an equal number of elements to select_var")
   } else if (all(length(rename_var) != 0, length(rename_var) == length(select_var))) {
     # if rename_var is provided, and equal to select_var, then rename before selection
-    inner_join(join_variable_1$data_out
-               ,join_variable_2$data_out
+    inner_join(data_out1
+               ,data_out2
                ,by = by_def) %>%
       rename_(.dots = dots) %>%
       select_(lazyeval::interp(~one_of(x), x = rename_var)) -> dat
   } else if (length(rename_var) == 0) {
     # if rename_var is not provided, just make selection
-    inner_join(join_variable_1$data_out
-               ,join_variable_2$data_out
+    inner_join(data_out1
+               ,data_out2
                ,by = by_def) %>%
       select_(lazyeval::interp(~one_of(x), x = select_var)) -> dat
   }
 
   dat %>%
-    group_by_(.dots = group) %>%
-    summarise_all(c("mean"), na.rm = TRUE) -> dat
+    group_by_(.dots = group_key) %>%
+    summarise_all(summary_function, na.rm = na_rm) -> dat
 
   return(dat)
 
 }
+
