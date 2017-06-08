@@ -1,10 +1,10 @@
 import_referral_scheduling_events <- function(con
-                                              ,output_name = 'tbl_referral_scheduling_events'
+                                              #,output_name = 'tbl_referral_scheduling_events'
                                               ,measurement_window
                                               ,measurement_window_start
                                               ,tz) {
 
-  #dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
+  dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
 
   # get the first date that a referral was scheduled
   suppressWarnings(
@@ -31,8 +31,10 @@ import_referral_scheduling_events <- function(con
     as_data_frame()
 )
 
-  assign(x = output_name
-         ,value = tbl_referral_scheduling_events
-         ,pos = 1)
+  return(tbl_referral_scheduling_events)
+
+  # assign(x = output_name
+  #        ,value = tbl_referral_scheduling_events
+  #        ,pos = 1)
 
 }

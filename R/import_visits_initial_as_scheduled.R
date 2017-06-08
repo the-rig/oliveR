@@ -1,10 +1,10 @@
-import_visits_initial_as_sceduled <- function(con
-                                              ,output_name = 'tbl_visits_initial_as_sceduled'
+import_visits_initial_as_scheduled <- function(con
+                                              #,output_name = 'tbl_visits_initial_as_sceduled'
                                               ,measurement_window
                                               ,measurement_window_start
                                               ,tz) {
 
-  #dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
+  dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
 
   tbl_scheduling_events <- dbGetQuery(con$con
                                       ,'
@@ -22,8 +22,10 @@ import_visits_initial_as_sceduled <- function(con
     summarise(dt_scheduled_visit_initial = min(visitstartdatenormalized)) %>%
     as_data_frame()
 
-  assign(x = output_name
-         ,value = tbl_scheduling_events_initial
-         ,pos = 1)
+  return(tbl_scheduling_events_initial)
+
+  # assign(x = output_name
+  #        ,value = tbl_scheduling_events_initial
+  #        ,pos = 1)
 
 }
