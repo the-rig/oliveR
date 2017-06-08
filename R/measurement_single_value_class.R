@@ -33,6 +33,7 @@ measurement_single_value <- R6Class("measurement_single_value",
           ,join_variable_2 = NULL
           ,select_var = NULL
           ,rename_var = NULL
+          ,data_out_type = NULL
           ,summary_function = NULL
           ,na_rm = NULL
           ,initialize = function(metric_key = NA
@@ -45,6 +46,7 @@ measurement_single_value <- R6Class("measurement_single_value",
                                  ,join_variable_2 = NA
                                  ,select_var = NA
                                  ,rename_var = NA
+                                 ,data_out_type = NA
                                  ,summary_function = 'mean'
                                  ,na_rm = TRUE) {
             self$metric_key <- metric_key
@@ -57,6 +59,7 @@ measurement_single_value <- R6Class("measurement_single_value",
             self$join_variable_2 <- join_variable_2
             self$select_var <- select_var
             self$rename_var <- rename_var
+            self$data_out_type <- data_out_type
             self$summary_function <- summary_function
             self$na_rm <- na_rm
             self$aggr_varset <- summarise_vars(join_variable_1 = self$join_variable_1
@@ -64,6 +67,7 @@ measurement_single_value <- R6Class("measurement_single_value",
                                                 ,select_var = self$select_var
                                                 ,rename_var = self$rename_var
                                                 ,group_key = self$group_key
+                                                ,data_out_type = self$data_out_type
                                                 ,summary_function = self$summary_function
                                                 ,na_rm = self$na_rm)
           }
