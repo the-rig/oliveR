@@ -15,7 +15,9 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
                                    ,characteristic_percent_conforming_obj = 2
                                    ,characteristic_data_quality_obj = 3
                                    ,sub_label_pre = ''
-                                   ,sub_label_post = ' Scheduled within 3 Days')
+                                   ,sub_label_post = ' Scheduled within 3 Days'
+                                   ,primary_measure = 1
+                                   ,secondary_measure = 2)
 
   # missing_list <- missing_list_add(x$acceptance_to_schedule$measurement_missing)
   #
@@ -27,7 +29,9 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
                                    ,characteristic_percent_conforming_obj = 5
                                    ,characteristic_data_quality_obj = 6
                                    ,sub_label_pre = ''
-                                   ,sub_label_post = ' Planned within 7 Days')
+                                   ,sub_label_post = ' Planned within 7 Days'
+                                   ,primary_measure = 4
+                                   ,secondary_measure = 5)
 
   # missing_list <- missing_list_add(x$acceptance_to_first_visit$measurement_missing)
   #
@@ -37,7 +41,9 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
                                    ,characteristic_label = 'Children per Referral'
                                    ,characteristic_summary_obj = 7
                                    ,characteristic_percent_conforming_obj = NA
-                                   ,characteristic_data_quality_obj = NA)
+                                   ,characteristic_data_quality_obj = NA
+                                   ,primary_measure = 7
+                                   ,secondary_measure = NA)
 
   # missing_list <- missing_list_add(x$child_count_value$measurement_missing)
   #
@@ -47,7 +53,9 @@ get_metric_list <- function(mpp_group = pcv_performance_monitoring, group_id){
                                    ,characteristic_label = 'Visit Attendance Rate'
                                    ,characteristic_summary_obj = 8
                                    ,characteristic_percent_conforming_obj = NA
-                                   ,characteristic_data_quality_obj = NA)
+                                   ,characteristic_data_quality_obj = NA
+                                   ,primary_measure = 8
+                                   ,secondary_measure = NA)
 
   # missing_list <- missing_list_add(x$attendance_per_scheduled_visit$measurement_missing)
   #

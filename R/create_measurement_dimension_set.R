@@ -6,7 +6,9 @@ create_measurement_dimension_set <- function(mpp_group = NA
                                              ,characteristic_percent_conforming_obj = NA
                                              ,characteristic_data_quality_obj = NA
                                              ,sub_label_pre = NA
-                                             ,sub_label_post = NA){
+                                             ,sub_label_post = NA
+                                             ,primary_measure = NA
+                                             ,secondary_measure = NA){
 
   # get a metric list
   measurement_list <- mpp_group$measurement_list
@@ -81,6 +83,50 @@ create_measurement_dimension_set <- function(mpp_group = NA
     characteristic_sub_label = NA
   }
 
+  if (!is.na(primary_measure)){
+    value_raw <- mpp_group$measurement_list[[primary_measure]]$get_value(group_id)
+  }
+
+
+  if (mpp_group$measurement_list[[primary_measure]]$measurement_format == 'days') {
+    value_round <- round(mpp_group$measurement_list[[primary_measure]]$get_value(group_id)
+                         ,mpp_group$measurement_list[[primary_measure]]$measurement_rounding)
+    value <- paste0(value_round, ' Days')
+  } else if (mpp_group$measurement_list[[primary_measure]]$measurement_format == 'numeric') {
+    value_round <- round(mpp_group$measurement_list[[primary_measure]]$get_value(group_id)
+                         ,mpp_group$measurement_list[[primary_measure]]$measurement_rounding)
+    value <- value_round
+  } else if (mpp_group$measurement_list[[primary_measure]]$measurement_format == 'percent') {
+    value <- sprintf(paste0('%1.'
+                                ,measurement_list[[primary_measure]]$measurement_rounding
+                                ,'f%%')
+                         ,100*value_raw)
+  } else {
+    value <- NA
+  }
+
+
+  if (!is.na(secondary_measure)){
+
+    sub_value <- mpp_group$measurement_list[[secondary_measure]]$get_value(group_id)
+
+    if (mpp_group$measurement_list[[secondary_measure]]$measurement_format == 'percent') {
+      sub_value <- sprintf(paste0('%1.'
+                                  ,measurement_list[[secondary_measure]]$measurement_rounding
+                                  ,'f%%')
+                           ,100*sub_value)
+    } else{
+      sub_value <- sub_value
+    }
+  } else{
+    sub_value <- NA
+  }
+
+
+  if(any(!is.na(sub_label_pre), !is.na(sub_label_post))){
+    sub_value <- paste0(sub_label_pre, sub_value, sub_label_post)
+  }
+
   dimensions <- data.frame(characteristic = characteristic
                            ,characteristic_label = characteristic_label
                            ,characteristic_sub_label = characteristic_sub_label
@@ -91,9 +137,11 @@ create_measurement_dimension_set <- function(mpp_group = NA
                            ,characteristic_data_quality_value = characteristic_data_quality_value
                            ,measurement_missing = ifelse(is.na(characteristic_summary_value) |
                                                            is.nan(characteristic_summary_value), TRUE, FALSE)
-                           ,value = NA
-                           ,label = NA
-                           ,sublabel = NA
+                           ,value = value
+                           ,label = mpp_group$measurement_list[[primary_measure]]$measurement_name
+                           ,sublabel = sub_value
+                           ,threshold = FALSE
+                           ,template = 'default'
   )
 
   return(dimensions)
