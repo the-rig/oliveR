@@ -13,6 +13,8 @@ summarise_vars <- function (join_variable_1
 
   # define the type of data_out we are looking for
 
+  data_out_type <- ifelse(length(data_out_type) == 1, rep(data_out_type, 2))
+
   if(data_out_type[1] == 'identity'){
     data_out1 <- join_variable_1$data_out_identity
   } else if(data_out_type == 'performance'){
