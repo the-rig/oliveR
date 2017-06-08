@@ -5,9 +5,9 @@
 \title{Define a tibble period variable (in days)}
 \usage{
 define_var_period(event_start_tibble, event_stop_tibble, event_start_var,
-  event_stop_var, population_member_id, period_name,
-  exclusions = list_holidays_and_weekends(), period_target = NA,
-  overwrite_negative = TRUE, jitter = Sys.getenv("OLIVER_REPLICA_JITTER"))
+  event_stop_var, id, period_name, exclusions = list_holidays_and_weekends(),
+  period_target = NA, overwrite_negative = TRUE,
+  jitter = Sys.getenv("OLIVER_REPLICA_JITTER"))
 }
 \arguments{
 \item{event_start_tibble}{A tibble with a date column representing the start of a period and \code{population_member_id} column.}
@@ -18,8 +18,6 @@ define_var_period(event_start_tibble, event_stop_tibble, event_start_var,
 
 \item{event_stop_var}{The name of the date column in \code{event_stop_tibble}.}
 
-\item{population_member_id}{A unique identifier for each 'member' of the population of interest. Must be present in both tibbles.}
-
 \item{period_name}{The desired name for the period column to be created in the new tibble.}
 
 \item{exclusions}{A vector of \code{Interval} objects, typically created from \code{list_holidays_and_weekends()}. Defaults is a call to \code{list_holidays_and_weekends()}.}
@@ -27,6 +25,8 @@ define_var_period(event_start_tibble, event_stop_tibble, event_start_var,
 \item{period_target}{A numeric value to serve as a threshold value. If provided, a second tibble will be calculated indicating whether or not the period value is less than or equal to the threshold value. Defaults is \code{NA}.}
 
 \item{overwrite_negative}{A binary value indicating whether or not negative interval values should be set to \code{NA}. Defaults is \code{TRUE}.}
+
+\item{population_member_id}{A unique identifier for each 'member' of the population of interest. Must be present in both tibbles.}
 }
 \description{
 Define a tibble period variable (in days)

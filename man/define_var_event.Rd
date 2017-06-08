@@ -4,7 +4,7 @@
 \alias{define_var_event}
 \title{Define a tibble event variable}
 \usage{
-define_var_event(data, population_member_id, value_date)
+define_var_event(data, id, value_date, tz = "America/Los_Angeles")
 }
 \description{
 Define a tibble event variable
