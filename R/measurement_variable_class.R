@@ -70,7 +70,7 @@ measurement_variable <- R6Class("measurement_variable"
                       self$measurement_window <- measurement_window
                       self$measurement_window_start <- measurement_window_start
                       self$tz <- tz
-                      if(is_function(import_visits_initial_as_scheduled)){
+                      if(is_function(self$data_in)){
                         self$data_in <- do.call(self$data_in
                                                 ,args = list(con = self$con
                                                              #,output_name = self$data_in_name
