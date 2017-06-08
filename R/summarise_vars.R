@@ -1,8 +1,8 @@
 
-summarise_vars <- function (join_variable_1 = referral_attr_child_count
-                            ,join_variable_2 = referral_attr_id_organization
-                            ,select_var = c('attr_values.x', 'attr_values.y')
-                            ,rename_var = c('attr_child_count', 'id_organization')
+summarise_vars <- function (join_variable_1
+                            ,join_variable_2
+                            ,select_var
+                            ,rename_var
                             ,group_key = 'id_organization'
                             ,data_out_type = 'identity'
                             ,summary_function = 'mean'
@@ -18,10 +18,10 @@ summarise_vars <- function (join_variable_1 = referral_attr_child_count
     data_out2 <- join_variable_2$data_out_identity
   } else if(data_out_type == 'performance'){
     data_out1 <- join_variable_1$data_out_performance
-    data_out2 <- join_variable_2$data_out_performance
+    data_out2 <- join_variable_2$data_out_identity
   } else if(data_out_type == 'quality'){
     data_out1 <- join_variable_1$data_out_quality
-    data_out2 <- join_variable_2$data_out_quality
+    data_out2 <- join_variable_2$data_out_identity
   } else {
     stop(paste0("data_out_type of, ", data_out_type, " not currently defined"))
   }
@@ -29,6 +29,8 @@ summarise_vars <- function (join_variable_1 = referral_attr_child_count
 
 
   # if the id_cols of both variables are equal, by_def is set to join_variable_1$id_col
+  # if the id_col in join_variable_1 does not exist within the selected data_out,
+  # the join will not be possible and the script will fail
   if(join_variable_1$id_col != join_variable_2$id_col) {
     by_def <- join_variable_1$id_col
   } else if (join_variable_1$id_col == join_variable_2$id_col) {
