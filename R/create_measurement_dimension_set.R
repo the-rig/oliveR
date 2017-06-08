@@ -91,6 +91,9 @@ create_measurement_dimension_set <- function(mpp_group = NA
                            ,characteristic_data_quality_value = characteristic_data_quality_value
                            ,measurement_missing = ifelse(is.na(characteristic_summary_value) |
                                                            is.nan(characteristic_summary_value), TRUE, FALSE)
+                           ,value = NA
+                           ,label = NA
+                           ,sublabel = NA
   )
 
   return(dimensions)
