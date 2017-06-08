@@ -4,7 +4,7 @@ summarise_vars <- function (join_variable_1
                             ,select_var
                             ,rename_var
                             ,group_key = 'id_organization'
-                            ,data_out_type = 'identity'
+                            ,data_out_type = c('identity', 'identity')
                             ,summary_function = 'mean'
                             ,na_rm = TRUE) {
 
@@ -13,17 +13,24 @@ summarise_vars <- function (join_variable_1
 
   # define the type of data_out we are looking for
 
-  if(data_out_type == 'identity'){
+  if(data_out_type[1] == 'identity'){
     data_out1 <- join_variable_1$data_out_identity
-    data_out2 <- join_variable_2$data_out_identity
   } else if(data_out_type == 'performance'){
     data_out1 <- join_variable_1$data_out_performance
-    data_out2 <- join_variable_2$data_out_identity
   } else if(data_out_type == 'quality'){
     data_out1 <- join_variable_1$data_out_quality
-    data_out2 <- join_variable_2$data_out_identity
   } else {
-    stop(paste0("data_out_type of, ", data_out_type, " not currently defined"))
+    stop(paste0("data_out_type[1] of, ", data_out_type[1], " not currently defined"))
+  }
+
+  if(data_out_type[2] == 'identity'){
+    data_out2 <- join_variable_2$data_out_identity
+  } else if(data_out_type[2] == 'performance'){
+    data_out2 <- join_variable_2$data_out_performance
+  } else if(data_out_type[2] == 'quality'){
+    data_out2 <- join_variable_2$data_out_quality
+  } else {
+    stop(paste0("data_out_type[2] of, ", data_out_type[2], " not currently defined"))
   }
 
 
