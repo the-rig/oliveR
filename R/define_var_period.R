@@ -29,6 +29,7 @@ define_var_period <- function(event_start_tibble
                     ,'interval_raw')
 
   # initialize period_dat tibble by joining the two event tibbles together
+  suppressMessages(
   period_dat <- inner_join(event_start_tibble
                            ,event_stop_tibble) %>%
     select_(id
@@ -36,6 +37,7 @@ define_var_period <- function(event_start_tibble
             ,event_stop_var) %>%
     mutate_(., .dots = dots1) %>%
     as_data_frame()
+  )
 
   # add a column to period_dat based on the exclusions param
   period_dat$interval_delta <- NA
