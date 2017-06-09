@@ -69,9 +69,16 @@ summarise_vars <- function (join_variable_1
       select_(lazyeval::interp(~one_of(x), x = select_var)) -> dat
   }
 
-  dat %>%
-    group_by_(.dots = group_key) %>%
-    summarise_all(summary_function, na.rm = na_rm) -> dat
+  if (summary_function == 'n') {
+    dat %>%
+      group_by_(.dots = group_key) %>%
+      summarise_all(summary_function) -> dat
+  } else {
+    dat %>%
+      group_by_(.dots = group_key) %>%
+      summarise_all(summary_function, na.rm = na_rm) -> dat
+  }
+
 
   return(dat)
 
