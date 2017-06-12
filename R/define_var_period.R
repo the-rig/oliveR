@@ -42,9 +42,11 @@ define_var_period <- function(event_start_tibble
   # add a column to period_dat based on the exclusions param
   period_dat$interval_delta <- NA
 
+  suppressMessages(
   for (i in 1:nrow(period_dat)){
     period_dat$interval_delta[i] <- sum(exclusions %within% period_dat$interval_raw[i])
   }
+  )
 
   # set names for the second table
   dots2 <- setNames(list(lazyeval::interp(~ x
@@ -55,6 +57,7 @@ define_var_period <- function(event_start_tibble
   )
 
   # put everything together
+  suppressMessages(
   period_dat_value <- period_dat %>%
     mutate(period_all = as.period(interval_raw, unit = 'days') - days(interval_delta)
            ,period_days = as.numeric(period_all, 'days')
@@ -70,7 +73,9 @@ define_var_period <- function(event_start_tibble
                                                           ,prob = runif(1))} else period_days) %>%
     select_(id
             ,quote(period_days))
+  )
 
+  suppressMessages(
   period_dat_target <- period_dat %>%
     mutate(period_all = as.period(interval_raw, unit = 'days') - days(interval_delta)
            ,period_days = as.numeric(period_all, 'days')
@@ -82,6 +87,7 @@ define_var_period <- function(event_start_tibble
     select_(id
             ,quote(met_target)
     )
+  )
 
   period_dat_quality <- period_dat_value %>%
     mutate(valid_data = ifelse(is.na(period_days), FALSE, TRUE)) %>%
