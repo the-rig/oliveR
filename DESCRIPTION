@@ -13,7 +13,6 @@ RoxygenNote: 6.0.1
 Depends:
     dplyr
     ,rlang
-    ,pbapply
     ,ggplot2
     ,RPostgreSQL
     ,feather
@@ -23,9 +22,7 @@ Depends:
     ,tidyjson
     ,stringr
     ,httr
-    ,keyringr
     ,lazyeval
-    ,ggvis
     ,RJSONIO
     ,graphics
     ,grid
