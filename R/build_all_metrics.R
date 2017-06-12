@@ -207,7 +207,7 @@ build_all_metrics <- function(
 
   pcv_performance_monitoring <- measurement_group$new()
 
-  message('building and aggregating varsets...', appendLF = FALSE)
+  message('building and aggregating varsets', appendLF = FALSE)
 
   measurement_single_value$new(metric_key = 'period_days'
                                ,group_key = 'id_organization'
@@ -222,6 +222,8 @@ build_all_metrics <- function(
                                ,summary_function = 'mean'
                                ,na_rm = TRUE) %>%
     pcv_performance_monitoring$measurement_add(.)
+
+  message(' . ', appendLF = FALSE)
 
   # inner_join(referral_period_acceptance_to_schedule[[2]]
   #                                            ,referral_attr_id_organization
@@ -251,6 +253,8 @@ build_all_metrics <- function(
                                ,summary_function = 'mean'
                                ,na_rm = TRUE) %>%
     pcv_performance_monitoring$measurement_add(.)
+
+  message(' . ', appendLF = FALSE)
 
 
 #
@@ -283,6 +287,8 @@ build_all_metrics <- function(
                                ,na_rm = TRUE) %>%
     pcv_performance_monitoring$measurement_add(.)
 
+  message(' . ', appendLF = FALSE)
+
   # inner_join(referral_period_acceptance_to_schedule_nas
   #            ,referral_attr_id_organization
   #            ,by = 'id_referral_visit') %>%
@@ -313,6 +319,8 @@ build_all_metrics <- function(
                                ,na_rm = TRUE) %>%
     pcv_performance_monitoring$measurement_add(.)
 
+  message(' . ', appendLF = FALSE)
+
   # inner_join(referral_period_acceptance_to_first_scheduled[[2]]
   #                                               ,referral_attr_id_organization
   #                                               ,by = 'id_referral_visit') %>%
@@ -341,6 +349,8 @@ build_all_metrics <- function(
                                ,summary_function = 'mean'
                                ,na_rm = TRUE) %>%
     pcv_performance_monitoring$measurement_add(.)
+
+  message(' . ', appendLF = FALSE)
 
   # inner_join(referral_period_acceptance_to_first_scheduled[[1]]
   #                                                   ,referral_attr_id_organization
@@ -371,6 +381,8 @@ build_all_metrics <- function(
                                ,na_rm = TRUE) %>%
     pcv_performance_monitoring$measurement_add(.)
 
+  message(' . ', appendLF = FALSE)
+
   #### CURRENTLY THE ONLY METRIC RUNNING ON THE "NEW" METHOD OF AGGREGATION" #####
   measurement_single_value$new(metric_key = 'attr_child_count'
                                ,group_key = 'id_organization'
@@ -385,6 +397,8 @@ build_all_metrics <- function(
                                ,summary_function = 'mean'
                                ,na_rm = TRUE) %>%
     pcv_performance_monitoring$measurement_add(.)
+
+  message(' . ', appendLF = FALSE)
 
   ################################################################################
 
@@ -419,6 +433,8 @@ build_all_metrics <- function(
                                ,na_rm = TRUE) %>%
     pcv_performance_monitoring$measurement_add(.)
 
+  message(' . ', appendLF = FALSE)
+
   # inner_join(referral_visit_attendance
   #            ,referral_attr_id_organization
   #            ,by = 'id_referral_visit') %>%
@@ -436,9 +452,9 @@ build_all_metrics <- function(
     # ) %>%
     # pcv_performance_monitoring$measurement_add(.)
 
-  message(' complete')
+  message(' done')
 
-  message('saving objects to file. file exists?...', appendLF = FALSE)
+  message('saving objects to file. ', appendLF = FALSE)
 
   file_path <- paste0(system.file('extdata'
                                   ,package = 'oliveR')
@@ -450,7 +466,7 @@ build_all_metrics <- function(
           ,file = file_path)
 
   message(paste0(' '
-                 ,file.exists(file_path))
+                 ,ifelse(file.exists(file_path), 'done', 'warning file does not exist'))
   )
 
 }

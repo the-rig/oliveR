@@ -48,34 +48,35 @@ summarise_vars <- function (join_variable_1
     stop(paste0("data_out_type[2] of, ", data_out_type[2], " not currently defined"))
   }
 
-  # create a calendar table
-  start_date <- data_out1 %>%
-    select_(join_variable_1$value_col1) %>%
-    mutate_all(as_date) %>%
-    summarise_all(min) %>%
-    .[[join_variable_1$value_col1]]
+  if(data_out_type[1] == 'cut'){
+    # create a calendar table
+    start_date <- data_out1 %>%
+      select_(join_variable_1$value_col1) %>%
+      mutate_all(as_date) %>%
+      summarise_all(min) %>%
+      .[[join_variable_1$value_col1]]
 
-  stop_date <- data_out1 %>%
-    select_(join_variable_1$value_col1) %>%
-    mutate_all(as_date) %>%
-    summarise_all(max) %>%
-    .[[join_variable_1$value_col1]]
+    stop_date <- data_out1 %>%
+      select_(join_variable_1$value_col1) %>%
+      mutate_all(as_date) %>%
+      summarise_all(max) %>%
+      .[[join_variable_1$value_col1]]
 
-  calendar_dates <- seq(start_date
-                        ,stop_date
-                        ,by = join_variable_1$ts_cut_type)
+    calendar_dates <- seq(start_date
+                          ,stop_date
+                          ,by = join_variable_1$ts_cut_type)
 
-  group_ids <- unique(referral_attr_id_organization$data_out_identity[['attr_values']])
+    group_ids <- unique(referral_attr_id_organization$data_out_identity[['attr_values']])
 
-  suppressWarnings(
-    data.frame(x = as.character(interaction(calendar_dates, group_ids))) %>%
-      separate(x
-               ,c(join_variable_1$ts_cut_type, 'group')
-               ,sep = '[.]') %>%
-      mutate_(.dots = dots3) %>%
-      mutate(group = as.integer(group)) -> calendar_dat
-  )
-
+    suppressWarnings(
+      data.frame(x = as.character(interaction(calendar_dates, group_ids))) %>%
+        separate(x
+                 ,c(join_variable_1$ts_cut_type, 'group')
+                 ,sep = '[.]') %>%
+        mutate_(.dots = dots3) %>%
+        mutate(group = as.integer(group)) -> calendar_dat
+    )
+  }
 
   # if the id_cols of both variables are equal, by_def is set to join_variable_1$id_col
   # if the id_col in join_variable_1 does not exist within the selected data_out,
