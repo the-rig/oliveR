@@ -20,15 +20,19 @@ import_referral_scheduling_events <- function(con
 )
 
   suppressWarnings(
-  tbl_referral_scheduling_events <- tbl(con, 'ServiceReferrals') %>%
+  tbl_referral_scheduling_events_prep <- tbl(con, 'ServiceReferrals') %>%
     inner_join(tbl_first_referral_scheduling_ver_min, by = c("versionId", "id")) %>%
     select(id
            ,referralReason
            ,updatedAt) %>%
     filter(referralReason == 'Initial') %>%
-    rename(id_referral_visit = id
-           ,dt_referral_scheduled = updatedAt) %>%
     as_data_frame()
+  )
+
+  suppressWarnings(
+    tbl_referral_scheduling_events_prep %>%
+    rename(id_referral_visit = id
+           ,dt_referral_scheduled = updatedAt) -> tbl_referral_scheduling_events
 )
 
   return(tbl_referral_scheduling_events)
