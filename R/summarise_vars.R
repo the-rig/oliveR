@@ -8,8 +8,16 @@ summarise_vars <- function (join_variable_1
                             ,summary_function = 'mean'
                             ,na_rm = TRUE) {
 
-  dots <- setNames(as.list(select_var)
+  dots1 <- setNames(as.list(select_var)
                    ,rename_var)
+
+  dots2 <- setNames(list(lazyeval::interp(~ as_date(x)
+                                          ,x = as.name(join_variable_1$value_col1)))
+                    ,join_variable_1$value_col1)
+
+  dots3 <- setNames(list(lazyeval::interp(~ as_date(x)
+                                          ,x = as.name(join_variable_1$ts_cut_type)))
+                    ,join_variable_1$ts_cut_type)
 
   # define the type of data_out we are looking for
 
@@ -24,6 +32,8 @@ summarise_vars <- function (join_variable_1
     data_out1 <- join_variable_1$data_out_performance
   } else if(data_out_type[1] == 'quality'){
     data_out1 <- join_variable_1$data_out_quality
+  } else if(data_out_type[1] == 'cut'){
+    data_out1 <- join_variable_1$data_out_cut
   } else {
     stop(paste0("data_out_type[1] of, ", data_out_type[1], " not currently defined"))
   }
@@ -38,7 +48,35 @@ summarise_vars <- function (join_variable_1
     stop(paste0("data_out_type[2] of, ", data_out_type[2], " not currently defined"))
   }
 
+  if(data_out_type[1] == 'cut'){
+    # create a calendar table
+    start_date <- data_out1 %>%
+      select_(join_variable_1$value_col1) %>%
+      mutate_all(as_date) %>%
+      summarise_all(min) %>%
+      .[[join_variable_1$value_col1]]
 
+    stop_date <- data_out1 %>%
+      select_(join_variable_1$value_col1) %>%
+      mutate_all(as_date) %>%
+      summarise_all(max) %>%
+      .[[join_variable_1$value_col1]]
+
+    calendar_dates <- seq(start_date
+                          ,stop_date
+                          ,by = join_variable_1$ts_cut_type)
+
+    group_ids <- unique(referral_attr_id_organization$data_out_identity[['attr_values']])
+
+    suppressWarnings(
+      data.frame(x = as.character(interaction(calendar_dates, group_ids))) %>%
+        separate(x
+                 ,c(join_variable_1$ts_cut_type, 'group')
+                 ,sep = '[.]') %>%
+        mutate_(.dots = dots3) %>%
+        mutate(group = as.integer(group)) -> calendar_dat
+    )
+  }
 
   # if the id_cols of both variables are equal, by_def is set to join_variable_1$id_col
   # if the id_col in join_variable_1 does not exist within the selected data_out,
@@ -59,7 +97,7 @@ summarise_vars <- function (join_variable_1
     inner_join(data_out1
                ,data_out2
                ,by = by_def) %>%
-      rename_(.dots = dots) %>%
+      rename_(.dots = dots1) %>%
       select_(lazyeval::interp(~one_of(x), x = rename_var)) -> dat
   } else if (length(rename_var) == 0) {
     # if rename_var is not provided, just make selection
@@ -69,9 +107,30 @@ summarise_vars <- function (join_variable_1
       select_(lazyeval::interp(~one_of(x), x = select_var)) -> dat
   }
 
-  dat %>%
-    group_by_(.dots = group_key) %>%
-    summarise_all(summary_function, na.rm = na_rm) -> dat
+  if(data_out_type[1] == 'cut'){
+
+    dat %>%
+      mutate_(.dots = dots2) -> dat
+
+    by_def2 <- c(referral_event_acceptance$value_col1, group_key)
+    names(by_def2) <- c(join_variable_1$ts_cut_type, 'group')
+
+    group_keys <- c('group', join_variable_1$ts_cut_type)
+
+    full_join(calendar_dat
+              ,dat
+              ,by = by_def2
+    ) -> dat
+
+    dat %>%
+      group_by_(.dots = group_keys) %>%
+      summarise_all(summary_function, na.rm = na_rm) -> dat
+
+  } else {
+    dat %>%
+      group_by_(.dots = group_key) %>%
+      summarise_all(summary_function, na.rm = na_rm) -> dat
+  }
 
   return(dat)
 

@@ -23,7 +23,6 @@ measurement_variable <- R6Class("measurement_variable"
                     ,id_col = NULL
                     ,value_col1 = NULL
                     ,value_col2 = NULL
-                    #logical indicating whether or not we want to jitter the values
                     ,target = NULL
                     # a performance target for the variable
                     ,na_attr = NULL
@@ -31,6 +30,9 @@ measurement_variable <- R6Class("measurement_variable"
                     ,data_out_identity = NULL
                     ,data_out_performance = NULL
                     ,data_out_quality = NULL
+                    ,data_out_cut = NULL # for event variables, create a column of cuts of type 'tx_cut_type'
+                    #logical indicating whether or not we want to jitter the values
+                    ,ts_cut_type = NULL
                     ,initialize = function(name = NA
                                           ,data_in = NA
                                           #,data_in_name = 'tbl_referral_acceptance_events'
@@ -49,7 +51,8 @@ measurement_variable <- R6Class("measurement_variable"
                                           ,value_col1 = NA
                                           ,value_col2 = NA
                                           ,target = NA
-                                          ,na_attr = NA) {
+                                          ,na_attr = NA
+                                          ,ts_cut_type = NA) {
                       self$name <- name
                       self$data_in <- data_in
                       self$type <- type
@@ -60,6 +63,7 @@ measurement_variable <- R6Class("measurement_variable"
                       self$exclusions <- exclusions
                       self$target <- target
                       self$na_attr <- na_attr
+                      self$ts_cut_type <- ts_cut_type
                       self$con <- src_postgres(
                         dbname = dbname,
                         host = host,
@@ -108,6 +112,19 @@ measurement_variable <- R6Class("measurement_variable"
                         self$data_out_identity <- data_out[[2]]
                         self$data_out_performance <- data_out[[1]]
                       }
+                      if(all(!is.na(self$ts_cut_type), self$type == 'event')){
+                        dots <- setNames(list(lazyeval::interp(~ cut(x, self$ts_cut_type)
+                                                                ,x = as.name(self$value_col1)))
+                                          ,self$value_col1)
+                        self$data_out_cut <- self$data_out_identity %>%
+                          mutate_(., .dots = dots)
+                      } else {
+                        self$data_out_cut <- NULL
+                      }
+                        # ifelse(all(!is.na(self$ts_cut_type),
+                        #                        ,cut(self$data_out_identity[,self$value_col1]
+                        #                             ,self$ts_cut_type)
+                        #                        ,NULL)
                     }
                   )
 )
