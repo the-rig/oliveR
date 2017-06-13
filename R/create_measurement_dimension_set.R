@@ -125,7 +125,22 @@ create_measurement_dimension_set <- function(mpp_group = NA
 
   if(any(!is.na(sub_label_pre), !is.na(sub_label_post))){
     sub_value <- paste0(sub_label_pre, sub_value, sub_label_post)
+  } else
+    sub_value <- 'NA'
+
+  if (any(stringr::str_detect(value, 'NA')
+          ,stringr::str_detect(value, 'NaN'))) {
+
+    value <- NA
+
   }
+  # else if (any(stringr::str_detect(sub_value, 'NA')
+  #                 ,stringr::str_detect(sub_value, 'NaN'))
+  #            ) {
+  #
+  #   sub_value <- NA
+  #
+  # }
 
   dimensions <- data.frame(characteristic = characteristic
                            ,characteristic_label = characteristic_label
@@ -139,7 +154,10 @@ create_measurement_dimension_set <- function(mpp_group = NA
                                                            is.nan(characteristic_summary_value), TRUE, FALSE)
                            ,value = value
                            ,label = mpp_group$measurement_list[[primary_measure]]$measurement_name
-                           ,sublabel = sub_value
+                           ,sublabel = ifelse(any(stringr::str_detect(sub_value, 'NA')
+                                                   ,stringr::str_detect(sub_value, 'NaN'))
+                                              ,'NA'
+                                              ,sub_value)
                            ,threshold = FALSE
                            ,template = 'default'
   )
