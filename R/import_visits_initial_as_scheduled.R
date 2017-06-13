@@ -22,6 +22,12 @@ import_visits_initial_as_scheduled <- function(con
     summarise(dt_scheduled_visit_initial = min(visitstartdatenormalized)) %>%
     as_data_frame()
 
+  # we first make a table which containes all of the visitSchedule information (from the ServiceReferrals table)
+  # we filter this table to ensure that the referrals is the most current version, has not been deleted, and is
+  # an 'Initial' referral
+
+  # we then select the first scheduled visit from across all referral versions.
+
   return(tbl_scheduling_events_initial)
 
   # assign(x = output_name

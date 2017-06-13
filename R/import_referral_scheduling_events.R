@@ -6,7 +6,11 @@ import_referral_scheduling_events <- function(con
 
   dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
 
-  # get the first date that a referral was scheduled
+
+  # using the ServiceReferrals table...
+  # we select all referral versions where the referalState was equal to Scheduled, and where the request date is valid
+  # we then select the first version of those "Scheduled" referrals.
+
   suppressWarnings(
   tbl_first_referral_scheduling_ver_min <- tbl(con, 'ServiceReferrals') %>%
     select(id
@@ -18,6 +22,11 @@ import_referral_scheduling_events <- function(con
     group_by(id) %>%
     summarise(versionId = min(versionId))
 )
+
+  # using the ServiceReferrals table...
+  # we also select those referrals where the referral reason is 'Initial'
+  # finally, we ensure that we only have those initial referrals where
+  # we have an associated 'scheduled' referral version as selected above.
 
   suppressWarnings(
   tbl_referral_scheduling_events_prep <- tbl(con, 'ServiceReferrals') %>%
@@ -34,6 +43,9 @@ import_referral_scheduling_events <- function(con
     rename(id_referral_visit = id
            ,dt_referral_scheduled = updatedAt) -> tbl_referral_scheduling_events
 )
+
+  # the resulting table contains the first time a referral was switched to the 'scheduled' state
+  # where the referralReason was of type "Initial"
 
   return(tbl_referral_scheduling_events)
 
