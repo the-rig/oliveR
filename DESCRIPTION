@@ -11,7 +11,7 @@ License: MIT
 LazyData: TRUE
 RoxygenNote: 6.0.1
 Depends:
-    dplyr (== 0.5.0)
+    dplyr
     ,rlang
     ,ggplot2 
     ,RPostgreSQL
