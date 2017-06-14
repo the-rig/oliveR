@@ -157,7 +157,7 @@ create_measurement_dimension_set <- function(mpp_group = NA
                            ,value = ifelse(any(stringr::str_detect(value, 'NA')
                                                ,stringr::str_detect(value, 'NaN'))
                                            ,'NA'
-                                           ,sub_value)
+                                           ,value)
                            ,label = mpp_group$measurement_list[[primary_measure]]$measurement_name
                            ,sublabel = ifelse(any(stringr::str_detect(sub_value, 'NA')
                                                    ,stringr::str_detect(sub_value, 'NaN'))
