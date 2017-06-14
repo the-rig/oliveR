@@ -123,17 +123,17 @@ create_measurement_dimension_set <- function(mpp_group = NA
   }
 
 
-  if(any(!is.na(sub_label_pre), !is.na(sub_label_post))){
-    sub_value <- paste0(sub_label_pre, sub_value, sub_label_post)
-  } else
-    sub_value <- 'NA'
-
-  if (any(stringr::str_detect(value, 'NA')
-          ,stringr::str_detect(value, 'NaN'))) {
-
-    value <- NA
-
-  }
+  # if(any(!is.na(sub_label_pre), !is.na(sub_label_post))){
+  #   sub_value <- paste0(sub_label_pre, sub_value, sub_label_post)
+  # } else
+  #   sub_value <- 'NA'
+  #
+  # if (any(stringr::str_detect(value, 'NA')
+  #         ,stringr::str_detect(value, 'NaN'))) {
+  #
+  #   value <- NA
+  #
+  # }
   # else if (any(stringr::str_detect(sub_value, 'NA')
   #                 ,stringr::str_detect(sub_value, 'NaN'))
   #            ) {
@@ -152,7 +152,10 @@ create_measurement_dimension_set <- function(mpp_group = NA
                            ,characteristic_data_quality_value = characteristic_data_quality_value
                            ,measurement_missing = ifelse(is.na(characteristic_summary_value) |
                                                            is.nan(characteristic_summary_value), TRUE, FALSE)
-                           ,value = value
+                           ,value = ifelse(any(stringr::str_detect(value, 'NA')
+                                               ,stringr::str_detect(value, 'NaN'))
+                                           ,'NA'
+                                           ,sub_value)
                            ,label = mpp_group$measurement_list[[primary_measure]]$measurement_name
                            ,sublabel = ifelse(any(stringr::str_detect(sub_value, 'NA')
                                                    ,stringr::str_detect(sub_value, 'NaN'))
