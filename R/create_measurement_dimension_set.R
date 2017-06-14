@@ -91,7 +91,9 @@ create_measurement_dimension_set <- function(mpp_group = NA
   if (mpp_group$measurement_list[[primary_measure]]$measurement_format == 'days') {
     value_round <- round(mpp_group$measurement_list[[primary_measure]]$get_value(group_id)
                          ,mpp_group$measurement_list[[primary_measure]]$measurement_rounding)
-    value <- paste0(value_round, ' Days')
+    #value <- paste0(value_round, ' Days')
+    value <- paste0(value_round)
+
   } else if (mpp_group$measurement_list[[primary_measure]]$measurement_format == 'numeric') {
     value_round <- round(mpp_group$measurement_list[[primary_measure]]$get_value(group_id)
                          ,mpp_group$measurement_list[[primary_measure]]$measurement_rounding)
