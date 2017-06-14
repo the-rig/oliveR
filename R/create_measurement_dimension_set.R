@@ -91,7 +91,9 @@ create_measurement_dimension_set <- function(mpp_group = NA
   if (mpp_group$measurement_list[[primary_measure]]$measurement_format == 'days') {
     value_round <- round(mpp_group$measurement_list[[primary_measure]]$get_value(group_id)
                          ,mpp_group$measurement_list[[primary_measure]]$measurement_rounding)
-    value <- paste0(value_round, ' Days')
+    #value <- paste0(value_round, ' Days')
+    value <- paste0(value_round)
+
   } else if (mpp_group$measurement_list[[primary_measure]]$measurement_format == 'numeric') {
     value_round <- round(mpp_group$measurement_list[[primary_measure]]$get_value(group_id)
                          ,mpp_group$measurement_list[[primary_measure]]$measurement_rounding)
@@ -127,13 +129,13 @@ create_measurement_dimension_set <- function(mpp_group = NA
     sub_value <- paste0(sub_label_pre, sub_value, sub_label_post)
   } else
     sub_value <- 'NA'
-
-  if (any(stringr::str_detect(value, 'NA')
-          ,stringr::str_detect(value, 'NaN'))) {
-
-    value <- NA
-
-  }
+  #
+  # if (any(stringr::str_detect(value, 'NA')
+  #         ,stringr::str_detect(value, 'NaN'))) {
+  #
+  #   value <- NA
+  #
+  # }
   # else if (any(stringr::str_detect(sub_value, 'NA')
   #                 ,stringr::str_detect(sub_value, 'NaN'))
   #            ) {
@@ -152,7 +154,10 @@ create_measurement_dimension_set <- function(mpp_group = NA
                            ,characteristic_data_quality_value = characteristic_data_quality_value
                            ,measurement_missing = ifelse(is.na(characteristic_summary_value) |
                                                            is.nan(characteristic_summary_value), TRUE, FALSE)
-                           ,value = value
+                           ,value = ifelse(any(stringr::str_detect(value, 'NA')
+                                               ,stringr::str_detect(value, 'NaN'))
+                                           ,'NA'
+                                           ,value)
                            ,label = mpp_group$measurement_list[[primary_measure]]$measurement_name
                            ,sublabel = ifelse(any(stringr::str_detect(sub_value, 'NA')
                                                    ,stringr::str_detect(sub_value, 'NaN'))
