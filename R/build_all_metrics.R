@@ -211,7 +211,7 @@ build_all_metrics <- function(
 
   measurement_single_value$new(metric_key = 'period_days'
                                ,group_key = 'id_organization'
-                               ,measurement_name = 'Expected Time to Schedule'
+                               ,measurement_name = 'Expected Days to Schedule'
                                ,measurement_format = 'days'
                                ,measurement_rounding = 1
                                ,join_variable_1 = referral_period_acceptance_to_schedule
@@ -242,7 +242,7 @@ build_all_metrics <- function(
 
   measurement_single_value$new(metric_key = 'met_target'
                                ,group_key = 'id_organization'
-                               ,measurement_name = 'Expected Time to Schedule'
+                               ,measurement_name = 'Expected Days to Schedule'
                                ,measurement_format = 'percent'
                                ,measurement_rounding = 0
                                ,join_variable_1 = referral_period_acceptance_to_schedule
@@ -275,7 +275,7 @@ build_all_metrics <- function(
 
   measurement_single_value$new(metric_key = 'valid_data'
                                ,group_key = 'id_organization'
-                               ,measurement_name = 'Expected Time to Schedule'
+                               ,measurement_name = 'Expected Days to Schedule'
                                ,measurement_format = 'percent'
                                ,measurement_rounding = 0
                                ,join_variable_1 = referral_period_acceptance_to_schedule
@@ -307,7 +307,7 @@ build_all_metrics <- function(
 
   measurement_single_value$new(metric_key = 'period_days'
                                ,group_key = 'id_organization'
-                               ,measurement_name = 'Expected Time to First Planned Visit'
+                               ,measurement_name = 'Expected Days to First Planned Visit'
                                ,measurement_format = 'days'
                                ,measurement_rounding = 1
                                ,join_variable_1 = referral_period_acceptance_to_first_scheduled
@@ -338,7 +338,7 @@ build_all_metrics <- function(
 
   measurement_single_value$new(metric_key = 'met_target'
                                ,group_key = 'id_organization'
-                               ,measurement_name = 'Expected Time to First Planned Visit'
+                               ,measurement_name = 'Expected Days to First Planned Visit'
                                ,measurement_format = 'percent'
                                ,measurement_rounding = 0
                                ,join_variable_1 = referral_period_acceptance_to_first_scheduled
@@ -369,7 +369,7 @@ build_all_metrics <- function(
 
   measurement_single_value$new(metric_key = 'valid_data'
                                ,group_key = 'id_organization'
-                               ,measurement_name = 'Expected Time to First Planned Visit'
+                               ,measurement_name = 'Expected Days to First Planned Visit'
                                ,measurement_format = 'percent'
                                ,measurement_rounding = 0
                                ,join_variable_1 = referral_period_acceptance_to_first_scheduled
