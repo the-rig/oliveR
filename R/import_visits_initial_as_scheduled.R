@@ -10,7 +10,7 @@ import_visits_initial_as_scheduled <- function(con
                                       ,'
                                       select
                                       id id_referral_visit
-                                      ,(json_array_elements(\"visitSchedule\") ->> \'visitStartDateNormalized\'::text)::date visitStartDateNormalized
+                                      ,(json_array_elements(\"visitSchedule\") ->> \'visitStartDate\'::text)::date visitStartDate
                                       from \"ServiceReferrals\"
                                       where \"isCurrentVersion\" = TRUE
                                       and \"deletedAt\" IS NULL
@@ -19,7 +19,7 @@ import_visits_initial_as_scheduled <- function(con
 
   tbl_scheduling_events_initial <- tbl_scheduling_events %>%
     group_by(id_referral_visit) %>%
-    summarise(dt_scheduled_visit_initial = min(visitstartdatenormalized)) %>%
+    summarise(dt_scheduled_visit_initial = min(visitstartdate)) %>%
     as_data_frame()
 
   # we first make a table which containes all of the visitSchedule information (from the ServiceReferrals table)

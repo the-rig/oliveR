@@ -27,7 +27,7 @@ import_visit_reports <- function(con
            ,isCurrentVersion
            ,deletedAt
            ,approvedAt
-           ,dateNormalized) %>%
+           ,date) %>%
     as_data_frame()
   )
 
@@ -38,8 +38,8 @@ import_visit_reports <- function(con
            # no longer appear to be needed though.
            #,is.na(deletedAt)
            #,!is.na(approvedAt)
-           ,dateNormalized > (lubridate::now(tzone = tz) - lubridate::days(measurement_window))
-           ,dateNormalized > lubridate::ymd(measurement_window_start)
+           ,date > (lubridate::now(tzone = tz) - lubridate::days(measurement_window))
+           ,date > lubridate::ymd(measurement_window_start)
    )
   )
 
