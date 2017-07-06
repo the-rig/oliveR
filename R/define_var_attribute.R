@@ -27,22 +27,26 @@ define_var_attribute <- function(data
             ,.dots = dots) %>%
     rename_(., .dots = setNames(value, "attr_values"))
 
-  # if TRUE, apply jitter for logical values
-  if (lapply(data[,value], class) == 'logical') {
-
-    attribute <- attribute %>%
-      mutate(attr_values = if(jitter){runif(n())} else attr_values
-             ,attr_values = ifelse(attr_values > mean_value, TRUE, FALSE))
-
-  # if TRUE, apply jitter for integer and double values
-  } else if (any(lapply(data[,value], class) == 'integer'
-                     ,lapply(data[,value], class) == 'double')) {
-    attribute <- attribute %>%
-      mutate(attr_values = if(jitter){attr_values + rbinom(n = n()
-                                                           ,size = round(as.numeric(mean_value)
-                                                                         ,digits = 0)
-                                                           ,prob = runif(1))
-        } else attr_values)
+  # if jitter=TRUE, apply jitter for logical values
+  if (jitter) {
+    if (lapply(data[, value], class) == 'logical') {
+      attribute <- attribute %>%
+        mutate(
+          attr_values = runif(n())
+          ,attr_values = ifelse(attr_values > mean_value, TRUE, FALSE)
+        )
+      
+      # if jitter=TRUE, apply jitter for integer and double values
+    } else if (any(lapply(data[, value], class) == 'integer' ,
+                   lapply(data[, value], class) == 'double')) {
+      attribute <- attribute %>%
+        mutate(attr_values = attr_values + rbinom(
+          n = n()
+          ,size = round(as.numeric(mean_value)
+                       , digits = 0)
+          ,prob = runif(1)
+        ))
+    }
   }
 
   return(attribute)
