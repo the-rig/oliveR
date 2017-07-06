@@ -7,7 +7,7 @@ import_referral_acceptance_events <- function(con
   dbSendQuery(con$con, build_sql("SET search_path TO ", 'staging'))
 
   # using the ServiceReferrals table...
-  # 1. select the id, versionId, referralState, and the requestDateNormalized fields.
+  # 1. select the id, versionId, referralState, and the requestDate fields.
   # 2. we limit this table to those referrals where the state is "Requested" and where the date field is valid.
   # 3. we then select the latest "version" of this field
   # the result of this query is the most recent request date for a given referral id.
@@ -19,15 +19,15 @@ import_referral_acceptance_events <- function(con
       select(id
              ,versionId
              ,referralState
-             ,requestDateNormalized) %>%
+             ,requestDate) %>%
       filter(referralState == 'Requested'
-             ,!is.na(requestDateNormalized)) %>%
+             ,!is.na(requestDate)) %>%
       group_by(id) %>%
       summarise(versionId = max(versionId))
   )
 
   # using the ServiceReferrals table...
-  # 1. select the id, versionId, referralState, and the requestDateNormalized fields.
+  # 1. select the id, versionId, referralState, and the requestDate fields.
   # 2. we limit this table to those referrals where the state is "Accepted" and where the date field is valid.
   # 3. we further limit this table to those referrals which "match" the referrals from the "requested" referral table
   # 4. we further limit the table to those "Accepted" referrals which took place after the "latest" requests.
@@ -38,11 +38,11 @@ import_referral_acceptance_events <- function(con
       select(id
              ,versionId
              ,referralState
-             ,requestDateNormalized) %>%
+             ,requestDate) %>%
       left_join(tbl_first_referral_requested_ver_max
                 ,by = 'id') %>%
       filter(referralState == 'Accepted'
-             ,!is.na(requestDateNormalized)
+             ,!is.na(requestDate)
              ,versionId.x > coalesce(versionId.y, 1)) %>%
       group_by(id) %>%
       summarise(versionId = min(versionId.x))

@@ -16,9 +16,9 @@ import_referral_scheduling_events <- function(con
     select(id
            ,versionId
            ,referralState
-           ,requestDateNormalized) %>%
+           ,requestDate) %>%
     filter(referralState == 'Scheduled'
-           ,!is.na(requestDateNormalized)) %>%
+           ,!is.na(requestDate)) %>%
     group_by(id) %>%
     summarise(versionId = min(versionId))
 )
