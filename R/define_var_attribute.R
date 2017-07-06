@@ -27,8 +27,9 @@ define_var_attribute <- function(data
             ,.dots = dots) %>%
     rename_(., .dots = setNames(value, "attr_values"))
 
-  # if jitter=TRUE, apply jitter for logical values
+  # if jitter=TRUE...
   if (jitter) {
+    # apply jitter for logical values
     if (lapply(data[, value], class) == 'logical') {
       attribute <- attribute %>%
         mutate(
@@ -36,7 +37,7 @@ define_var_attribute <- function(data
           ,attr_values = ifelse(attr_values > mean_value, TRUE, FALSE)
         )
       
-      # if jitter=TRUE, apply jitter for integer and double values
+    # apply jitter for integer and double values
     } else if (any(lapply(data[, value], class) == 'integer' ,
                    lapply(data[, value], class) == 'double')) {
       attribute <- attribute %>%
