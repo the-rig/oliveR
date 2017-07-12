@@ -36,6 +36,8 @@ measurement_single_value <- R6Class("measurement_single_value",
           ,data_out_type = NULL
           ,summary_function = NULL
           ,na_rm = NULL
+          ,calc_date = NULL
+          ,calc_sha = NULL
           ,initialize = function(metric_key = NA
                                  ,group_key = 'id_organization'
                                  ,measurement_name = NA
@@ -48,7 +50,9 @@ measurement_single_value <- R6Class("measurement_single_value",
                                  ,rename_var = NA
                                  ,data_out_type = NA
                                  ,summary_function = 'mean'
-                                 ,na_rm = TRUE) {
+                                 ,na_rm = TRUE
+                                 ,calc_date = NA
+                                 ,calc_sha = NA) {
             self$metric_key <- metric_key
             self$group_key <- group_key
             self$measurement_name <- measurement_name
@@ -70,6 +74,8 @@ measurement_single_value <- R6Class("measurement_single_value",
                                                 ,data_out_type = self$data_out_type
                                                 ,summary_function = self$summary_function
                                                 ,na_rm = self$na_rm)
+            self$calc_date <- lubridate::today()
+            self$calc_sha <- get_sha_info()
           }
           ,get_value = function(group_id) {
             filter_criteria <- interp(~ which_column == group_id
