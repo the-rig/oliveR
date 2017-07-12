@@ -165,6 +165,8 @@ create_measurement_dimension_set <- function(mpp_group = NA
                                               ,sub_value)
                            ,threshold = FALSE
                            ,template = 'default'
+                           ,calc_date = measurement_list[[characteristic_summary_obj]]$calc_date
+                           ,calc_sha = measurement_list[[characteristic_summary_obj]]$calc_sha
   )
 
   return(dimensions)
